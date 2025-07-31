@@ -6,9 +6,13 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./page.css";
 import Tooltip from "@/app/Tooltip/page";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import Link from "next/link";
 import Footer from "../Footer/page";
+import { auth } from "../../../lib/firebase";
 
 export default function Member() {
   const router = useRouter();
@@ -87,6 +91,7 @@ export default function Member() {
     setSuccess("");
 
     try {
+      await sendPasswordResetEmail(auth, formData.email);
       const res = await fetch("/api/changepassword/member", {
         method: "PATCH",
         headers: {
