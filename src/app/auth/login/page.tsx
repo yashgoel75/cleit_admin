@@ -34,7 +34,7 @@ export default function Login() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(false);
   const [falseUsernameFormat, setFalseUsernameFormat] = useState(false);
   const [falseEmailFormat, setFalseEmailFormat] = useState(false);
   const [falsePasswordFormat, setFalsePasswordFormat] = useState(false);
@@ -65,29 +65,19 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      formData.username == "" ||
-      formData.email == "" ||
-      formData.password == "" ||
-      formData.role == ""
-    ) {
-      setIsUsernameEmpty(formData.username == "");
+    if (formData.email == "" || formData.password == "") {
       setIsEmailEmpty(formData.email == "");
       setIsPasswordEmpty(formData.password == "");
-      setIsRoleEmpty(formData.role == "");
       return;
     }
     setIsSubmitting(true);
     setError("");
-    setSuccess("");
+    setSuccess(false);
 
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      const res = await axios.post(`/api/login/${formData.role}`, formData);
-      if (res.status === 200) {
-        setSuccess("Login successful! Redirecting...");
-        setTimeout(() => router.push("/Dashboard"), 1500);
-      }
+      setSuccess(true);
+      setTimeout(() => router.push("/"), 1500);
     } catch (err) {
       setError("Login failed. Please try again.");
       console.error(err);
@@ -260,7 +250,7 @@ export default function Login() {
                 type="submit"
                 className={`w-full bg-indigo-500 text-white px-6 py-2 rounded-md font-semibold transition hover:bg-indigo-700`}
               >
-                Login
+                {isSubmitting ? "Logging In..." : "Login"}
               </button>
             </div>
           </form>
