@@ -216,7 +216,7 @@ export default function Login() {
                 />
               </div>
               <div className="text-sm flex text-[#8C1A10] mt-1">
-                <Link href={"/auth/ForgotPassword"}>Forgot Password?</Link>
+                <Link href={"/auth/ResetPassword"}>Forgot Password?</Link>
               </div>
               {isPasswordEmpty ? (
                 <div className="text-sm flex text-[#8C1A10] mt-1">

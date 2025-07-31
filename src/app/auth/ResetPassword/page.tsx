@@ -2,20 +2,14 @@
 import { useState, useEffect } from "react";
 import logo from "@/assets/cleit.png";
 import Image from "next/image";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import "./page.css";
-import Tooltip from "@/app/Tooltip/page";
-import {
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import Link from "next/link";
 import Footer from "../Footer/page";
 import { auth } from "../../../lib/firebase";
 
 export default function Member() {
-  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const handleResize = () => {
@@ -37,7 +31,7 @@ export default function Member() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(false);
   const [falseUsernameFormat, setFalseUsernameFormat] = useState(false);
   const [falseEmailFormat, setFalseEmailFormat] = useState(false);
   const [falsePasswordFormat, setFalsePasswordFormat] = useState(false);
@@ -58,6 +52,7 @@ export default function Member() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSuccess(false);
 
     if (name === "email") {
       setIsEmailEmpty(false);
@@ -72,44 +67,18 @@ export default function Member() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      formData.email == "" ||
-      formData.password == "" ||
-      formData.confirmPassword == ""
-    ) {
+    if (formData.email == "") {
       setIsEmailEmpty(formData.email == "");
-      setIsPasswordEmpty(formData.password == "");
-      setIsConfirmPasswordEmpty(formData.confirmPassword == "");
-      return;
-    }
-    if (invalidOtp || !validOtp) {
-      setIsOtpVerificationFailed(true);
       return;
     }
     setIsSubmitting(true);
     setError("");
-    setSuccess("");
+    setSuccess(false);
 
     try {
       await sendPasswordResetEmail(auth, formData.email);
-      const res = await fetch("/api/changepassword/member", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          newPassword: formData.password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong.");
-      }
-
-      setSuccess("Password changed successfully!");
+      setSuccess(true);
+      console.log(success);
     } catch (err: any) {
       console.error("Password change error:", err);
       setError(err.message || "Failed to change password.");
@@ -118,51 +87,6 @@ export default function Member() {
     }
   };
 
-  async function sendEmailOtp() {
-    try {
-      const res = await fetch(`/api/register/member?email=${formData.email}`);
-      const data = await res.json();
-
-      const otpRes = await fetch("/api/otp/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: formData.email }),
-      });
-
-      const otpData = await otpRes.json();
-      if (!otpRes.ok) {
-        console.error("OTP error:", otpData.error);
-      }
-    } catch (error) {
-      console.log("Error checking email or sending OTP:", error);
-    }
-  }
-
-  async function verifyOtp() {
-    try {
-      const res = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: formData.email, otp: formData.otp }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.verified) {
-        setInvalidOtp(false);
-        setValidOtp(true);
-      } else {
-        setValidOtp(false);
-        setInvalidOtp(true);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
   useEffect(() => {
     const { email, password, confirmPassword } = formData;
 
@@ -187,7 +111,7 @@ export default function Member() {
       <div className="w-[95%] md:w-[80%] lg:w-[60%] mx-auto pt-10">
         <div className="border md:text-lg border-gray-300 p-4 md:p-6 rounded-xl shadow-md bg-white mb-8">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-            Forgot Password
+            Reset Password
           </h1>
 
           <form
@@ -205,15 +129,8 @@ export default function Member() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="flex-1 px-4 py-2 outline-none w-[70%] lg:w-[80%]"
+                  className="flex-1 px-4 py-2 outline-none"
                 />
-                <button
-                  type="button"
-                  onClick={() => sendEmailOtp()}
-                  className="bg-indigo-500 w-[30%] lg:w-[20%] outline-none text-white px-1 md:px-2 lg:px-4 md:px-2 lg:px-4 py-2 rounded-r-md hover:bg-indigo-700 hover:cursor-pointer"
-                >
-                  Send OTP
-                </button>
               </div>
               {isEmailEmpty ? (
                 <div className="text-sm flex text-[#8C1A10] mt-1">
@@ -244,7 +161,13 @@ export default function Member() {
                 &nbsp; Please enter a valid email address
               </div>
             ) : null}
-            <div>
+            {success ? (
+              <div className="text-sm md:text-base flex mt-1">
+                If an account is associated with this email address, you will
+                receive a password reset link shortly.
+              </div>
+            ) : null}
+            {/* <div>
               <label className="block mb-1 text-gray-700 font-medium">
                 Enter OTP
               </label>
@@ -443,7 +366,7 @@ export default function Member() {
                 </svg>
                 &nbsp; Passwords do not match.
               </div>
-            ) : null}
+            ) : null} */}
             {/* <div>
             <label className="block mb-1 text-gray-700 font-medium">
               Mobile
@@ -461,14 +384,18 @@ export default function Member() {
             <div className="text-center mt-3">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || success}
                 className={`w-full bg-indigo-500 text-white px-6 py-2 rounded-md font-semibold transition hover:bg-indigo-700 ${
-                  isSubmitting
+                  isSubmitting || success
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:cursor-pointer"
                 }`}
               >
-                {isSubmitting ? "Submitting..." : "Change Password"}
+                {isSubmitting
+                  ? "Submitting..."
+                  : success
+                    ? "Reset Email Sent"
+                    : "Reset Password"}
               </button>
             </div>
           </form>
