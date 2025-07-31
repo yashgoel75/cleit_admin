@@ -129,7 +129,7 @@ export default function Login() {
       </div>
       <div className="border-1 border-gray-200 mt-2"></div>
       <div className="w-[95%] md:w-[80%] lg:w-[60%] mx-auto pt-10 onest-normal">
-        <div className="border border-gray-300 p-6 rounded-xl shadow-md bg-white mb-8">
+        <div className="border border-gray-300 md:text-lg p-4 md:p-6 rounded-xl shadow-md bg-white mb-8">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
             Login to Cleit
           </h1>
@@ -214,6 +214,9 @@ export default function Login() {
                   }
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
                 />
+              </div>
+              <div className="text-sm flex text-[#8C1A10] mt-1">
+                <Link href={"/auth/ForgotPassword"}>Forgot Password?</Link>
               </div>
               {isPasswordEmpty ? (
                 <div className="text-sm flex text-[#8C1A10] mt-1">
