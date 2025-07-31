@@ -5,6 +5,8 @@ import Tooltip from "@/app/Tooltip/page";
 import Image from "next/image";
 import logo from "@/assets/cleit.png";
 import Footer from "../Footer/page";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../lib/firebase";
 
 export default function Society() {
   const [formData, setFormData] = useState({
@@ -95,6 +97,11 @@ export default function Society() {
     setError("");
 
     try {
+      await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password,
+      );
       const res = await axios.post("/api/register/society", formData);
       if (res.status === 200) {
         setSuccess("Society registered successfully!");
@@ -110,7 +117,7 @@ export default function Society() {
   async function isUsernameAvailable() {
     try {
       const res = await fetch(
-        `/api/register/society?username=${formData.username}`
+        `/api/register/society?username=${formData.username}`,
       );
       const data = await res.json();
 
@@ -160,7 +167,10 @@ export default function Society() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: formData.email, otp: formData.otp }),
+        body: JSON.stringify({
+          email: formData.email,
+          otp: formData.otp,
+        }),
       });
 
       const data = await res.json();
@@ -191,7 +201,7 @@ export default function Society() {
     setFalsePasswordFormat(password ? !passwordRegex.test(password) : false);
 
     setFalseConfirmPassword(
-      !!confirmPassword && !!password && confirmPassword !== password
+      !!confirmPassword && !!password && confirmPassword !== password,
     );
   }, [formData]);
 

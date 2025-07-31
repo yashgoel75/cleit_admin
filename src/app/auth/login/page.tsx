@@ -8,6 +8,8 @@ import axios from "axios";
 import Footer from "../Footer/page";
 import "./page.css";
 import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../lib/firebase";
 export default function Login() {
   const router = useRouter();
 
@@ -80,6 +82,7 @@ export default function Login() {
     setSuccess("");
 
     try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       const res = await axios.post(`/api/login/${formData.role}`, formData);
       if (res.status === 200) {
         setSuccess("Login successful! Redirecting...");
@@ -251,7 +254,7 @@ export default function Login() {
                 &nbsp; Please enter a valid password format
               </div>
             ) : null}
-            
+
             <div className="text-center">
               <button
                 type="submit"
