@@ -1,8 +1,29 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Onest:wght@100..900&family=Outfit:wght@100..900&display=swap');
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+}
+
+.onest-normal {
+  font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.onest-bold {
+  font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 @theme inline {
@@ -12,11 +33,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+} */
+
+* {
+  transition: 0.2s ease;
 }
 
 body {
