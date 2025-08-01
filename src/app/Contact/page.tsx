@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import instagram from "@/assets/Instagram.png";
 import linkedin from "@/assets/LinkedIn.png";
+import Footer from "../Footer/page";
 
 export default function Contact() {
   const [isNameEmpty, setIsNameEmpty] = useState(false);
@@ -277,7 +278,7 @@ export default function Contact() {
             Prefer socials? Let's connect there too.
           </h3>
         </div>
-        <div className="flex justify-center gap-6">
+        <div className="flex justify-center gap-4 md:gap-6">
           <a
             href="https://www.linkedin.com/in/yourprofile"
             target="_blank"
@@ -308,6 +309,7 @@ export default function Contact() {
           </a>
         </div>
       </div>
+      <Footer></Footer>
     </>
   );
 }
