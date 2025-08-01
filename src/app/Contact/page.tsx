@@ -2,7 +2,10 @@
 
 import "./page.css";
 import Header from "../Header/page";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import instagram from "@/assets/Instagram.png";
+import linkedin from "@/assets/LinkedIn.png";
 
 export default function Contact() {
   const [isNameEmpty, setIsNameEmpty] = useState(false);
@@ -39,6 +42,13 @@ export default function Contact() {
       setIsBodyEmpty(false);
     }
   };
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -259,6 +269,43 @@ export default function Contact() {
               </div>
             </form>
           </div>
+        </div>
+      </div>
+      <div className="bg-gray-50 py-6 px-4">
+        <div className="text-center mb-6">
+          <h3 className="text-gray-800 md:text-lg font-medium">
+            Prefer socials? Let's connect there too.
+          </h3>
+        </div>
+        <div className="flex justify-center gap-6">
+          <a
+            href="https://www.linkedin.com/in/yourprofile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-indigo-600 transition transform hover:scale-110"
+            aria-label="LinkedIn"
+          >
+            <Image
+              className="hover:shadow-lg"
+              src={linkedin}
+              width={isMobile ? 30 : 35}
+              alt="Linkedin Logo"
+            ></Image>
+          </a>
+          <a
+            href="https://instagram.com/yourprofile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-indigo-600 transition transform hover:scale-110"
+            aria-label="Instagram"
+          >
+            <Image
+              className="rounded-md hover:shadow-lg"
+              src={instagram}
+              width={isMobile ? 30 : 35}
+              alt="Instagram Logo"
+            ></Image>
+          </a>
         </div>
       </div>
     </>

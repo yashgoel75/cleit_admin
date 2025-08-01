@@ -128,7 +128,7 @@ export default function Login() {
         <Image src={logo} width={200} alt="cleit"></Image>
       </div>
       <div className="border-1 border-gray-200 mt-2"></div>
-      <div className="w-[95%] md:w-[80%] lg:w-[60%] mx-auto pt-10 onest-normal">
+      <div className="w-[95%] lg:w-full max-w-4xl mx-auto pt-10 onest-normal">
         <div className="border border-gray-300 md:text-lg p-4 md:p-6 rounded-xl shadow-md bg-white mb-8">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
             Login to Cleit

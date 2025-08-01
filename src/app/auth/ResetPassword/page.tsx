@@ -108,7 +108,7 @@ export default function Member() {
         <Image src={logo} width={isMobile ? 150 : 200} alt="cleit"></Image>
       </div>
       <div className="border-1 border-gray-200 mt-2"></div>
-      <div className="w-[95%] md:w-[80%] lg:w-[60%] mx-auto pt-10">
+      <div className="w-[95%] lg:w-full max-w-4xl mx-auto pt-10">
         <div className="border md:text-lg border-gray-300 p-4 md:p-6 rounded-xl shadow-md bg-white mb-8">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
             Reset Password
