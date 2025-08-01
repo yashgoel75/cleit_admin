@@ -33,7 +33,6 @@ export default function Account() {
         throw new Error(data.error || "Failed to fetch society data");
       setTeam(data.society.team);
       setDisplayName(data.society.name);
-      console.log(data.society.name);
       setError(null);
     } catch (err: any) {
       setError(err.message);
@@ -111,7 +110,7 @@ export default function Account() {
   return (
     <>
       <Header />
-      <div className="border-b border-gray-200 mt-2" />
+      <div className="border-1 border-gray-200 mt-2" />
       <main className="w-[95%] min-h-[85vh] lg:w-full max-w-6xl mx-auto py-10 md:py-16 px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 mb-12">
           Manage Your Team
@@ -126,7 +125,7 @@ export default function Account() {
               setEditingEmail(null);
               setIsAdding(true);
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition hover:cursor-pointer"
+            className="bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-medium transition hover:cursor-pointer"
           >
             + Add Team Member
           </button>
@@ -153,7 +152,7 @@ export default function Account() {
               <div className="flex gap-4 justify-center mt-2">
                 <button
                   onClick={handleSubmit}
-                  className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md transition hover:cursor-pointer"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition hover:cursor-pointer"
                 >
                   {editingEmail ? "Update" : "Add"}
                 </button>
@@ -202,7 +201,7 @@ export default function Account() {
                   {member.name}
                 </h3>
                 <p className="text-base text-gray-600 mb-1">
-                  <span className="font-medium">Designation:</span>{" "}
+                  <span className="font-medium">Designation:</span>
                   {member.designation}
                 </p>
                 <p className="text-base text-gray-600 mb-1">

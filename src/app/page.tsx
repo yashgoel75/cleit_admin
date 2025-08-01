@@ -9,6 +9,7 @@ import { getAuth, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 import "./page.css";
+import { log } from "console";
 export default function Home() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
@@ -26,11 +27,33 @@ export default function Home() {
   };
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [displayName, setDisplayName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSocietyName = async (email: string) => {
+    try {
+      const response = await fetch(
+        `/api/society/team?email=${encodeURIComponent(email)}`,
+      );
+      const data = await response.json();
+
+      if (!response.ok)
+        throw new Error(data.error || "Failed to fetch society data");
+      setDisplayName(data.society.name);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       console.log(user?.email);
+      if (user?.email) fetchSocietyName(user.email);
     });
 
     return () => unsubscribe();
@@ -49,8 +72,23 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex justify-between px-10 items-center">
-        <Image src={logo} width={isMobile ? 150 : 250} alt="Cleit"></Image>
+      <div className="flex justify-between px-5 items-center">
+        <Image
+          src={logo}
+          className="md:px-5"
+          width={isMobile ? 150 : 250}
+          alt="Cleit"
+        ></Image>
+        {currentUser ? (
+          <div className="hidden lg:flex items-center text-lg lg:text-[26px] font-medium gap-4">
+            <button
+              className="hover:cursor-pointer"
+              onClick={() => router.push("/Account")}
+            >
+              {displayName}
+            </button>
+          </div>
+        ) : null}
         {!currentUser ? (
           <div className="flex gap-4">
             <div
@@ -67,10 +105,25 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div>
-            <div title="Logout">
+          <div className="flex items-center gap-4">
+            <nav className="font-medium md:text-lg lg:text-xl">
+              <ul className="flex gap-5">
+                <li onClick={() => router.push("/Account/Events")}>
+                  <button className="hover:underline cursor-pointer">
+                    Events
+                  </button>
+                </li>
+                <li onClick={() => router.push("/Account/Team")}>
+                  <button className="hover:underline cursor-pointer">
+                    Team
+                  </button>
+                </li>
+              </ul>
+            </nav>
+            <div title="Logout" className="cursor-pointer">
               <svg
                 onClick={logout}
+                className="mr-5"
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"
                 viewBox="0 -960 960 960"
@@ -83,6 +136,8 @@ export default function Home() {
           </div>
         )}
       </div>
+      <div className="border-1 border-gray-200 mt-2" />
+
       <div className="flex justify-center items-center min-h-[80vh] onest-bold md:text-lg">
         <div className="space-y-2 md:space-y-3"></div>
       </div>

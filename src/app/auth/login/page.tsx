@@ -7,7 +7,13 @@ import { useRouter } from "next/navigation";
 import Footer from "../Footer/page";
 import "./page.css";
 import Link from "next/link";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signOut,
+  onAuthStateChanged,
+  User,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 export default function Login() {
   const router = useRouter();
@@ -78,7 +84,7 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       setSuccess(true);
-      setTimeout(() => router.push("/"), 1500);
+      setTimeout(() => router.push("/Account"), 1500);
     } catch (err) {
       setError(true);
       // console.error(err);
@@ -86,28 +92,30 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+  const [user, setUser] = useState<User | null>(null);
 
-  async function sendEmailOtp() {
-    try {
-      const res = await fetch(`/api/register/member?email=${formData.email}`);
-      const data = await res.json();
 
-      const otpRes = await fetch("/api/otp/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: formData.email }),
-      });
+  // async function sendEmailOtp() {
+  //   try {
+  //     const res = await fetch(`/api/register/member?email=${formData.email}`);
+  //     const data = await res.json();
 
-      const otpData = await otpRes.json();
-      if (!otpRes.ok) {
-        console.error("OTP error:", otpData.error);
-      }
-    } catch (error) {
-      console.log("Error checking email or sending OTP:", error);
-    }
-  }
+  //     const otpRes = await fetch("/api/otp/send", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email: formData.email }),
+  //     });
+
+  //     const otpData = await otpRes.json();
+  //     if (!otpRes.ok) {
+  //       console.error("OTP error:", otpData.error);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error checking email or sending OTP:", error);
+  //   }
+  // }
 
   useEffect(() => {
     const { email, password } = formData;
