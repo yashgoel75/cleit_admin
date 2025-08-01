@@ -51,7 +51,13 @@ export async function POST(req: NextRequest) {
       username,
       email,
       password: await argon2.hash(password),
+      about: "",
+      team: [],
+      social: [],
+      auditionOpen: false,
+      eligibility: []
     });
+
     console.log(society);
   } catch (e) {
     NextResponse.json("Error!");
