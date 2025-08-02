@@ -110,6 +110,7 @@ export default function Account() {
     }
   };
 
+  const [sucess, setSuccess] = useState(false);
   const handleUpdate = async () => {
     if (!currentUser) return;
     setIsUpdating(true);
@@ -146,10 +147,12 @@ export default function Account() {
       }
 
       await currentUser.reload();
-      alert("Society updated successfully!");
+      setSuccess(true);
       setIsEdit(false);
       setIsPreview(true);
       setLogoFile(null);
+      setSuccess(false);
+      setUsernameAvailable(false);
       await getSocietyByEmail(updatedData.email);
     } catch (err: any) {
       console.error(err);
@@ -205,6 +208,9 @@ export default function Account() {
             onClick={() => {
               setIsEdit(false);
               setIsPreview(true);
+              setUsernameAlreadyTaken(false);
+              setUsernameAvailable(false);
+              setSuccess(false);
             }}
             className={`px-5 md:text-lg py-1 rounded-md border transition duration-300 hover:cursor-pointer ${
               isPreview
@@ -229,6 +235,20 @@ export default function Account() {
               />
               <h3 className="text-3xl font-bold mt-4">{societyData?.name}</h3>
               <p className="text-gray-600 text-lg">@{societyData?.username}</p>
+              <p className="text-indigo-600 text-lg">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={
+                    societyData?.website?.startsWith("http")
+                      ? societyData.website
+                      : `https://${societyData?.website}`
+                  }
+                >
+                  {societyData?.website?.replace(/^https?:\/\//, "")}
+                </a>
+              </p>
+
               <p className="text-gray-700 mt-2">{societyData?.about}</p>
               <p className="text-gray-500 mt-1">{societyData?.email}</p>
               <p className="mt-2 text-sm font-medium">
@@ -286,6 +306,117 @@ export default function Account() {
             </section>
 
             <section>
+              <h4 className="flex items-center text-2xl font-semibold mb-4">
+                Events&nbsp;
+                <svg
+                  className="hover:cursor-pointer"
+                  onClick={() => router.push("/Account/Events")}
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#000000"
+                >
+                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
+                </svg>
+              </h4>
+
+              <div>
+                {societyData?.events?.length > 0 ? (
+                  <div
+                    className={`grid gap-6 sm:grid-cols-2 ${
+                      societyData.events.length === 1
+                        ? "lg:grid-cols-1"
+                        : societyData.events.length === 2
+                          ? "lg:grid-cols-2"
+                          : "lg:grid-cols-3"
+                    }`}
+                  >
+                    {societyData.events.map((event: any) => (
+                      <div
+                        key={event._id}
+                        className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"
+                      >
+                        <div className="flex-grow">
+                          <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                            {event.title}
+                          </h3>
+
+                          {event.type && (
+                            <p className="text-base text-gray-600 mb-1">
+                              <span className="font-medium">Type:</span>{" "}
+                              {event.type}
+                            </p>
+                          )}
+
+                          <p className="text-base text-gray-600 mb-1">
+                            <span className="font-medium">Venue:</span>{" "}
+                            {event.venue}
+                          </p>
+
+                          <p className="text-base text-gray-600 mb-1">
+                            <span className="font-medium">Time:</span>{" "}
+                            {event.time}
+                          </p>
+
+                          {event.endDate &&
+                          event.endDate !== event.startDate ? (
+                            <>
+                              <p className="text-base text-gray-600 mb-1">
+                                <span className="font-medium">Start:</span>{" "}
+                                {new Date(event.startDate).toLocaleDateString(
+                                  "en-IN",
+                                )}
+                              </p>
+                              <p className="text-base text-gray-600 mb-1">
+                                <span className="font-medium">End:</span>{" "}
+                                {new Date(event.endDate).toLocaleDateString(
+                                  "en-IN",
+                                )}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-base text-gray-600 mb-1">
+                              <span className="font-medium">Date:</span>{" "}
+                              {new Date(event.startDate).toLocaleDateString(
+                                "en-IN",
+                              )}
+                            </p>
+                          )}
+
+                          <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
+                            <span className="font-medium">About:</span>{" "}
+                            {event.about}
+                          </p>
+
+                          {event.socialGroup && (
+                            <p className="text-indigo-600 text-sm mt-2 break-all">
+                              <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={
+                                  event.socialGroup.startsWith("http")
+                                    ? event.socialGroup
+                                    : `https://${event.socialGroup}`
+                                }
+                              >
+                                {event.socialGroup.replace(/^https?:\/\//, "")}
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 italic">
+                    No scheduled events right now. Stay tuned!
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section>
               <h4 className="text-2xl font-semibold mb-4">Social Links</h4>
               <ul className="space-y-2">
                 {societyData?.social?.map((s: any, i: number) => {
@@ -320,61 +451,6 @@ export default function Account() {
                   );
                 })}
               </ul>
-            </section>
-            <section>
-              <h4 className="flex items-center text-2xl font-semibold mb-4">
-                Events&nbsp;
-                <svg
-                  className="hover:cursor-pointer"
-                  onClick={() => router.push("/Account/Events")}
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24px"
-                  viewBox="0 -960 960 960"
-                  width="24px"
-                  fill="#000000"
-                >
-                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
-                </svg>
-              </h4>
-              <div className="">
-                {societyData?.events?.length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {societyData.events.map((event: any, index: number) => (
-                      <div
-                        key={index}
-                        className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
-                      >
-                        <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                          {event.title}
-                        </h3>
-
-                        <p className="text-base text-gray-600 mb-1">
-                          <span className="font-medium">Date:</span>{" "}
-                          {event.date}
-                        </p>
-                        <p className="text-base text-gray-600 mb-1">
-                          <span className="font-medium">Time:</span>{" "}
-                          {event.time}
-                        </p>
-                        <p className="text-base text-gray-600 mb-1">
-                          <span className="font-medium">Venue:</span>{" "}
-                          {event.venue}
-                        </p>
-
-                        {event.description && (
-                          <p className="text-base text-gray-600 mt-2">
-                            {event.description}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 italic">
-                    No scheduled events right now. Stay tuned!
-                  </div>
-                )}
-              </div>
             </section>
 
             <section className="mt-8">
@@ -446,6 +522,23 @@ export default function Account() {
                         placeholder="Enter society name"
                         className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
                       />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Website</label>
+                      <div className="flex gap-1">
+                        <input
+                          type="text"
+                          value={formData?.website || ""}
+                          onChange={(e) => {
+                            setFormData((prev: any) => ({
+                              ...prev,
+                              website: e.target.value,
+                            }));
+                          }}
+                          placeholder="Enter website"
+                          className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block font-medium mb-1">Username</label>
@@ -640,9 +733,13 @@ export default function Account() {
                   <button
                     type="submit"
                     disabled={isUpdating}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed"
+                    className={`bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed ${isUpdating || sucess ? "opacity-50" : ""}`}
                   >
-                    {isUpdating ? "Saving..." : "Save Changes"}
+                    {isUpdating
+                      ? "Saving..."
+                      : sucess
+                        ? "Saved"
+                        : "Save Changes"}
                   </button>
                   <button
                     type="button"

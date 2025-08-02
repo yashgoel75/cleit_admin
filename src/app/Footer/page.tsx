@@ -4,6 +4,7 @@ import "./page.css";
 import logo from "@/assets/cleit.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Footer() {
   const router = useRouter();
@@ -13,9 +14,8 @@ export default function Footer() {
     <footer className="bg-gray-100 px-6 py-10 pt-10 onest-normal">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <Image src={logo} width={170} alt="Cleit"></Image>
+          <Link href={"/"}><Image src={logo} width={170} alt="Cleit"></Image></Link>
         </div>
-        {/* About */}
         <div>
           <h3 className="text-lg font-semibold mb-3">About Us</h3>
           <p className="text-sm text-gray-400">
@@ -25,7 +25,6 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Quick Links */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
           <ul className="space-y-2 text-sm">
@@ -39,13 +38,13 @@ export default function Footer() {
               className="hover:cursor-pointer"
               onClick={() => router.push("/")}
             >
-              About
+              About Us
             </li>
             <li
               className="hover:cursor-pointer"
               onClick={() => router.push("/Team")}
             >
-              Team
+              Our Team
             </li>
             <li
               className="hover:cursor-pointer"
@@ -56,7 +55,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Social / Contact */}
         <div>
           <h3 className="text-lg font-semibold mb-3">Connect</h3>
           <ul className="space-y-2 text-sm">

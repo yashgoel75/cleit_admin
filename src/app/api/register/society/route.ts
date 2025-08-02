@@ -52,8 +52,10 @@ export async function POST(req: NextRequest) {
       email,
       password: await argon2.hash(password),
       about: "",
+      website: "",
       team: [],
       social: [],
+      events: [],
       auditionOpen: false,
       eligibility: []
     });

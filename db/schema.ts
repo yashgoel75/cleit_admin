@@ -7,6 +7,12 @@ const team = new Schema({
   mobile: String,
   email: String,
 });
+const eventContact = new Schema({
+  name: String,
+  designation: String,
+  mobile: String,
+  email: String,
+});
 const social = new Schema({
   name: String,
   handle: String,
@@ -14,6 +20,17 @@ const social = new Schema({
 const eligibility = new Schema({
   name: String,
 });
+const event = new Schema({
+  title: String,
+  type: String,
+  startDate: String,
+  endDate: String,
+  venue: String,
+  time: String,
+  about: String,
+  contact: [eventContact],
+  socialGroup: String,
+})
 const society = new Schema({
   name: String,
   username: String,
@@ -21,9 +38,10 @@ const society = new Schema({
   email: String,
   password: String,
   about: String,
+  website: String,
   team: [team],
   social: [social],
-  events: [],
+  events: [event],
   auditionOpen: Boolean,
   eligibility: [eligibility],
 });

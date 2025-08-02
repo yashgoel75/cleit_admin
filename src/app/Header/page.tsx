@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getAuth, signOut, onAuthStateChanged, User } from "firebase/auth";
 import logo from "@/assets/cleit.png";
 import { auth } from "@/lib/firebase";
+import Link from "next/link";
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -141,7 +142,9 @@ export default function Header() {
       {isMobileNavOpen && (
         <div className="lg:hidden fixed inset-0 bg-white z-40 px-5 py-4">
           <div className="flex justify-between items-center mb-6">
-            <Image src={logo} width={140} alt="Cleit" />
+            <Link href={"/"}>
+              <Image src={logo} width={140} alt="Cleit" />
+            </Link>
             <button
               onClick={() => setIsMobileNavOpen(false)}
               className="text-2xl text-gray-800 hover:cursor-pointer"
@@ -212,7 +215,9 @@ export default function Header() {
 
       <header className="w-full px-5 py-4 flex items-center justify-between bg-white border-b border-gray-300 sticky top-0 z-30">
         <div className="flex items-center gap-4">
-          <Image src={logo} width={isMobile ? 140 : 200} alt="Cleit" />
+          <Link href={"/"}>
+            <Image src={logo} width={isMobile ? 140 : 200} alt="Cleit" />
+          </Link>
         </div>
 
         <div className="hidden lg:flex items-center gap-6">
