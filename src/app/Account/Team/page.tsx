@@ -110,7 +110,6 @@ export default function Account() {
   return (
     <>
       <Header />
-      <div className="border-1 border-gray-200 mt-2" />
       <main className="w-[95%] min-h-[85vh] lg:w-full max-w-6xl mx-auto py-10 md:py-16 px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 mb-12">
           Manage Your Team

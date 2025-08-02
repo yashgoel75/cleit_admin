@@ -6,3 +6,42 @@
   font-weight: 400;
   font-style: normal;
 }
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+}
+
+.navigationOnMobile {
+  z-index: 1000;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: white;
+}
+
+.slide-down {
+  animation: slideDown 0.2s ease;
+}
+
+.slide-up {
+  animation: slideUp 0.2s ease;
+}

@@ -4,26 +4,21 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAuth, signOut, onAuthStateChanged, User } from "firebase/auth";
-
 import logo from "@/assets/cleit.png";
 import { auth } from "@/lib/firebase";
-import "./page.css";
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const updateSize = () => setIsMobile(window.innerWidth <= 768);
-    updateSize();
-
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
+    const resizeHandler = () => setIsMobile(window.innerWidth <= 768);
+    resizeHandler();
+    window.addEventListener("resize", resizeHandler);
+    return () => window.removeEventListener("resize", resizeHandler);
   }, []);
 
   useEffect(() => {
@@ -31,7 +26,6 @@ export default function Header() {
       setUser(user);
       if (user?.email) fetchSocietyName(user.email);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -41,103 +35,219 @@ export default function Header() {
         `/api/society/team?email=${encodeURIComponent(email)}`,
       );
       const data = await response.json();
-
       if (!response.ok)
-        throw new Error(data.error || "Failed to fetch society data");
+        throw new Error(data.error || "Failed to fetch society name");
       setDisplayName(data.society.name);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
     }
   };
-
+  const [isLogoutConfirmationMessage, setIsLogoutConfirmationMessage] =
+    useState(false);
+  const handleLogoutConfirmation = () => {
+    setIsLogoutConfirmationMessage(true);
+  };
   const handleLogout = async () => {
     try {
       await signOut(getAuth());
       setUser(null);
-      router.push("/auth/login");
+      router.push("/");
     } catch (err) {
       console.error("Logout error:", err);
     }
   };
 
-  return (
-    <header className="flex items-center justify-between px-5">
-      <Image
-        src={logo}
-        width={isMobile ? 150 : 250}
-        alt="Cleit"
-        className="md:px-5"
-      />
+  const AuthButtons = () => (
+    <div className="flex gap-3">
+      <button
+        onClick={() => router.push("/auth/login")}
+        className="text-sm md:text-base px-4 py-1.5 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition hover:cursor-pointer"
+      >
+        Login
+      </button>
+      <button
+        onClick={() => router.push("/auth/register")}
+        className="text-sm md:text-base px-4 py-1.5 border border-gray-300 rounded-md hover:bg-gray-100 transition hover:cursor-pointer"
+      >
+        Register
+      </button>
+    </div>
+  );
 
-      <div className="block lg:hidden mr-5">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="#000000"
-        >
-          <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
-        </svg>
-      </div>
-      {user ? (
-        <div className="hidden lg:flex items-center text-lg lg:text-[26px] font-medium gap-4">
-          <button
-            className="hover:cursor-pointer"
-            onClick={() => router.push("/Account")}
+  const UserMenu = () => (
+    <div className="flex items-center gap-5">
+      <nav className="font-medium text-lg">
+        <ul className="flex gap-4">
+          <li
+            className="hover:underline cursor-pointer"
+            onClick={() => router.push("/Account/Events")}
           >
-            {displayName}
-          </button>
-        </div>
-      ) : null}
-
-      {!user ? (
-        <div className="hidden lg:flex items-center gap-4 mr-5">
-          <button
-            onClick={() => router.push("/auth/login")}
-            className="px-3 py-1 text-[17px] bg-indigo-500 text-white rounded-md hover:bg-indigo-700 hover:cursor-pointer"
+            Events
+          </li>
+          <li
+            className="hover:underline cursor-pointer"
+            onClick={() => router.push("/Account/Team")}
           >
-            Login
-          </button>
-          <button
-            onClick={() => router.push("/auth/register")}
-            className="px-3 py-1 text-[17px] border border-gray-300 rounded-md hover:bg-zinc-100 hover:cursor-pointer"
-          >
-            Register
-          </button>
-        </div>
+            Team
+          </li>
+        </ul>
+      </nav>
+      {isLogoutConfirmationMessage ? (
+        <>
+          <div className="flex-1">
+            <div>
+              <span className="text-red-500 text-base">
+                Are you sure you want to logout?
+              </span>
+            </div>
+            <div className="flex gap-4">
+              <button
+                className="hover:cursor-pointer text-red-700"
+                onClick={handleLogout}
+              >
+                Yes
+              </button>
+              <button
+                className="hover:cursor-pointer"
+                onClick={() => setIsLogoutConfirmationMessage(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </>
       ) : (
-        <div className="flex items-center gap-4">
-          <nav className="font-medium md:text-lg lg:text-xl">
-            <ul className="flex gap-5">
-              <li onClick={() => router.push("/Account/Events")}>
-                <button className="hover:underline cursor-pointer">
-                  Events
-                </button>
-              </li>
-              <li onClick={() => router.push("/Account/Team")}>
-                <button className="hover:underline cursor-pointer">Team</button>
-              </li>
-            </ul>
-          </nav>
-          <div title="Logout" className="cursor-pointer">
-            <svg
-              onClick={handleLogout}
-              className="mr-5"
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
-              fill="#000000"
+        <button
+          title="Logout"
+          onClick={handleLogoutConfirmation}
+          className="text-gray-600 hover:text-red-500 transition hover:cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            fill="currentColor"
+          >
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      {isMobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 bg-white z-40 px-5 py-4">
+          <div className="flex justify-between items-center mb-6">
+            <Image src={logo} width={140} alt="Cleit" />
+            <button
+              onClick={() => setIsMobileNavOpen(false)}
+              className="text-2xl text-gray-800 hover:cursor-pointer"
             >
-              <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
-            </svg>
+              ✕
+            </button>
+          </div>
+          <div className="space-y-5 text-lg">
+            {user ? (
+              <>
+                <p
+                  onClick={() => router.push("/Account")}
+                  className="font-semibold cursor-pointer"
+                >
+                  {displayName}
+                </p>
+                <p
+                  onClick={() => router.push("/Account/Events")}
+                  className="cursor-pointer hover:underline"
+                >
+                  Events
+                </p>
+                <p
+                  onClick={() => router.push("/Account/Team")}
+                  className="cursor-pointer hover:underline"
+                >
+                  Team
+                </p>
+                {isLogoutConfirmationMessage ? (
+                  <>
+                    <div className="flex-1">
+                      <div>
+                        <span className="text-red-500">
+                          Are you sure you want to logout?
+                        </span>
+                      </div>
+                      <div className="flex gap-4">
+                        <button
+                          className="hover:cursor-pointer text-red-700"
+                          onClick={handleLogout}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          className="hover:cursor-pointer"
+                          onClick={() => setIsLogoutConfirmationMessage(false)}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleLogoutConfirmation}
+                    className="text-red-600 font-medium underline hover:cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                )}
+              </>
+            ) : (
+              <AuthButtons />
+            )}
           </div>
         </div>
       )}
-    </header>
+
+      <header className="w-full px-5 py-4 flex items-center justify-between bg-white border-b border-gray-300 sticky top-0 z-30">
+        <div className="flex items-center gap-4">
+          <Image src={logo} width={isMobile ? 140 : 200} alt="Cleit" />
+        </div>
+
+        <div className="hidden lg:flex items-center gap-6">
+          {user ? (
+            <>
+              <button
+                onClick={() => router.push("/Account")}
+                className="font-semibold text-lg hover:text-indigo-700 transition hover:cursor-pointer"
+              >
+                {displayName}
+              </button>
+              <UserMenu />
+            </>
+          ) : (
+            <AuthButtons />
+          )}
+        </div>
+
+        <div className="block lg:hidden">
+          <button
+            onClick={() => setIsMobileNavOpen(true)}
+            className="hover:cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="26px"
+              viewBox="0 -960 960 960"
+              width="26px"
+              fill="#333"
+            >
+              <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+            </svg>
+          </button>
+        </div>
+      </header>
+    </>
   );
 }

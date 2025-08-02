@@ -6,6 +6,7 @@ import Footer from "@/app/Footer/page";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 export default function Account() {
   const [societyData, setSocietyData] = useState<any>(null);
@@ -18,7 +19,7 @@ export default function Account() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user?.email) {
@@ -156,7 +157,6 @@ export default function Account() {
   return (
     <>
       <Header />
-      <div className="border-t border-indigo-300 mt-2"></div>
       <main className="w-[95%] min-h-[85vh] lg:w-full max-w-6xl mx-auto py-10 md:py-16 px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 mb-12">
           Manage Your Society Account
@@ -222,9 +222,62 @@ export default function Account() {
             </section>
 
             <section>
-              <h4 className="text-2xl font-semibold mb-4">Team Members</h4>
+              <h4 className="flex items-center text-2xl font-semibold mb-4">
+                Team Members&nbsp;
+                <svg
+                  className="hover:cursor-pointer"
+                  onClick={() => router.push("/Account/Team")}
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#000000"
+                >
+                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
+                </svg>
+              </h4>
               <div className="grid md:grid-cols-2 gap-6">
                 {societyData?.team?.map((member: any, index: number) => (
+                  <div
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
+                  >
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                      {member.name}
+                    </h3>
+                    <p className="text-base text-gray-600 mb-1">
+                      <span className="font-medium">Designation:&nbsp;</span>
+                      {member.designation}
+                    </p>
+                    <p className="text-base text-gray-600 mb-1">
+                      <span className="font-medium">Mobile:</span>{" "}
+                      {member.mobile}
+                    </p>
+                    <p className="text-base text-gray-600">
+                      <span className="font-medium">Email:</span> {member.email}
+                    </p>
+                  </div>
+                ))}
+              </div>
+                </section>
+                
+                <section>
+              <h4 className="flex items-center text-2xl font-semibold mb-4">
+                Events&nbsp;
+                <svg
+                  className="hover:cursor-pointer"
+                  onClick={() => router.push("/Account/Events")}
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#000000"
+                >
+                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
+                </svg>
+              </h4>
+              <div className="grid md:grid-cols-2 gap-6">
+                {societyData?.events?.map((member: any, index: number) => (
                   <div
                     key={index}
                     className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"

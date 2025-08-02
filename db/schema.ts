@@ -23,6 +23,7 @@ const society = new Schema({
   about: String,
   team: [team],
   social: [social],
+  events: [],
   auditionOpen: Boolean,
   eligibility: [eligibility],
 });

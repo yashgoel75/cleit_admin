@@ -103,7 +103,6 @@ export default function Contact() {
   return (
     <>
       <Header />
-      <div className="border-t border-gray-200 mt-2" />
 
       <div className="w-full min-h-[80vh] bg-gray-50 flex items-center py-10 md:py-20 px-4">
         <div className="max-w-5xl w-full mx-auto grid md:grid-cols-2 gap-12">

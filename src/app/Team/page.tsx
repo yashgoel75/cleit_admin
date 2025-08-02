@@ -35,7 +35,6 @@ export default function Team() {
   return (
     <>
       <Header />
-      <div className="border-t border-gray-200 mt-2" />
       <div className="w-[95%] min-h-[85vh] lg:w-full max-w-6xl mx-auto py-10 md:py-20 px-4">
         <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">
           Meet Our Team
