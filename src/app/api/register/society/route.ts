@@ -33,9 +33,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-
+interface team {
+  name: string,
+  username: string,
+  email: string,
+  password: string
+}
 export async function POST(req: NextRequest) {
-  const { name, username, email, password } = (await req.json()) as any;
+  const { name, username, email, password } = (await req.json()) as team;
   try {
     if (!name || !username || !email || !password) {
       console.error("Missing entries");

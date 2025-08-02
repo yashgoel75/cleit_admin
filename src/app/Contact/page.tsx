@@ -92,9 +92,13 @@ export default function Contact() {
         subject: "",
         body: "",
       });
-    } catch (error: any) {
-      console.error("Contact form error:", error.message);
-      alert("Failed to send your message. Please try again later.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Contact form error:", error.message);
+        alert("Failed to send your message. Please try again later.");
+      } else {
+        console.error("Error");
+      }
     } finally {
       setLoading(false);
     }

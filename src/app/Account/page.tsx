@@ -66,7 +66,7 @@ export default function Account() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user?.email) {
@@ -160,7 +160,7 @@ export default function Account() {
   const handleUpdate = async () => {
     if (!currentUser) return;
     setIsUpdating(true);
-    let updatedData = { ...formData };
+    const updatedData = { ...formData };
 
     try {
       if (logoFile) {
