@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import logo from "@/assets/cleit.png";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import "./page.css";
 import { sendPasswordResetEmail } from "firebase/auth";
 import Link from "next/link";
@@ -32,20 +31,8 @@ export default function Member() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [falseUsernameFormat, setFalseUsernameFormat] = useState(false);
   const [falseEmailFormat, setFalseEmailFormat] = useState(false);
-  const [falsePasswordFormat, setFalsePasswordFormat] = useState(false);
-  const [falseConfirmPassword, setFalseConfirmPassword] = useState(false);
-
-  const [invalidOtp, setInvalidOtp] = useState(false);
-  const [validOtp, setValidOtp] = useState(false);
-
   const [isEmailEmpty, setIsEmailEmpty] = useState(false);
-  const [isOtpVerificationFailed, setIsOtpVerificationFailed] = useState(false);
-  const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
-  const [isConfirmPasswordEmpty, setIsConfirmPasswordEmpty] = useState(false);
-
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -56,12 +43,6 @@ export default function Member() {
 
     if (name === "email") {
       setIsEmailEmpty(false);
-    }
-    if (name == "password") {
-      setIsPasswordEmpty(false);
-    }
-    if (name == "confirmPassword") {
-      setIsConfirmPasswordEmpty(false);
     }
   };
 
@@ -79,27 +60,24 @@ export default function Member() {
       await sendPasswordResetEmail(auth, formData.email);
       setSuccess(true);
       console.log(success);
-    } catch (err: any) {
-      console.error("Password change error:", err);
-      setError(err.message || "Failed to change password.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Password change error:", err);
+        setError(err.message || "Failed to change password.");
+      } else {
+        setError("Error");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    const { email, password, confirmPassword } = formData;
+    const { email} = formData;
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     setFalseEmailFormat(email ? !emailRegex.test(email) : false);
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
-    setFalsePasswordFormat(password ? !passwordRegex.test(password) : false);
-
-    setFalseConfirmPassword(
-      !!confirmPassword && !!password && confirmPassword !== password,
-    );
   }, [formData]);
 
   return (

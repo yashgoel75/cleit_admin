@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
 
-// POST: Add new team member
+interface member {
+  name: string,
+  designation: string,
+  mobile: string,
+  email: string
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { societyEmail, newMember } = await req.json();
@@ -21,8 +27,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: "Failed to add member", details: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: "Failed to add member" }, { status: 500 });
   }
 }
 
@@ -44,7 +50,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Society not found" }, { status: 404 });
     }
 
-    const memberIndex = society.team.findIndex((m: any) => m.email === memberEmail);
+    const memberIndex = society.team.findIndex((m: member) => m.email === memberEmail);
     if (memberIndex === -1) {
       return NextResponse.json({ error: "Team member not found" }, { status: 404 });
     }
@@ -54,9 +60,9 @@ export async function PATCH(req: NextRequest) {
     await society.save();
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to update member", details: error.message },
+      { error: "Failed to update member" },
       { status: 500 }
     );
   }
@@ -85,9 +91,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to delete member", details: error.message },
+      { error: "Failed to delete member" },
       { status: 500 }
     );
   }
@@ -110,9 +116,9 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to fetch society", details: error.message },
+      { error: "Failed to fetch society" },
       { status: 500 }
     );
   }
