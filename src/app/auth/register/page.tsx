@@ -7,10 +7,12 @@ import logo from "@/assets/cleit.png";
 import Footer from "../Footer/page";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import "./page.css";
 
 export default function Society() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -106,7 +108,7 @@ export default function Society() {
       );
       const res = await axios.post("/api/register/society", formData);
       if (res.status === 200) {
-        setSuccess("Society registered successfully!");
+        router.push("/auth/login");
       }
     } catch (err) {
       console.error(err);

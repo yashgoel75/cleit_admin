@@ -8,12 +8,51 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export default function Account() {
-  const [displayName, setDisplayName] = useState("");
   const [societyData, setSocietyData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<any>(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [isPreview, setIsPreview] = useState(true);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user?.email) {
+        setCurrentUser(user);
+        getSocietyByEmail(user.email);
+      } else {
+        setCurrentUser(null);
+        setSocietyData(null);
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const getSocietyByEmail = async (email: string | null | undefined) => {
+    if (!email) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `/api/society/team?email=${encodeURIComponent(email)}`,
+      );
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || "Failed to fetch society data");
+      setSocietyData(data.society);
+      setFormData(data.society);
+      setLogoPreview(data.society?.logo || null);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEligibilityChange = (index: number, value: string) => {
     const updated = [...formData.eligibility];
@@ -47,7 +86,7 @@ export default function Account() {
   const handleAddSocial = () => {
     setFormData((prev: any) => ({
       ...prev,
-      social: [...(prev?.social || []), { name: "", handle: "" }],
+      social: [...(prev?.social || []), { name: "LinkedIn", handle: "" }],
     }));
   };
 
@@ -57,61 +96,67 @@ export default function Account() {
     setFormData((prev: any) => ({ ...prev, social: updated }));
   };
 
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleUpdate = async () => {
+    if (!currentUser) return;
+    setIsUpdating(true);
+    let updatedData = { ...formData };
+
     try {
+      if (logoFile) {
+        const formData = new FormData();
+        formData.append("file", logoFile);
+        formData.append("upload_preset", "cleit_admin_logo");
+        const cloudinaryUploadUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+        const response = await fetch(cloudinaryUploadUrl, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error?.message || "Cloudinary upload failed");
+        }
+        updatedData.logo = data.secure_url;
+      }
+
       const res = await fetch("/api/society/account", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           societyEmail: currentUser?.email,
-          updates: formData,
+          updates: updatedData,
         }),
       });
-
-      if (!res.ok) throw new Error("Failed to update society");
-
-      setIsEdit(false);
-      getSocietyByEmail(currentUser?.email);
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const getSocietyByEmail = async (email: string | null | undefined) => {
-    try {
-      const res = await fetch(
-        `/api/society/team?email=${encodeURIComponent(email || "")}`,
-      );
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || "Failed to fetch society data");
-      setSocietyData(data.society);
-      setDisplayName(data.society.name);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user?.email) {
-        getSocietyByEmail(user.email);
-        setCurrentUser(user);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to update society");
       }
-    });
-    return () => unsubscribe();
-  }, []);
 
-  const [isEdit, setIsEdit] = useState(false);
-  const [isPreview, setIsPreview] = useState(true);
+      await currentUser.reload();
+      alert("Society updated successfully!");
+      setIsEdit(false);
+      setIsPreview(true);
+      setLogoFile(null);
+      await getSocietyByEmail(updatedData.email);
+    } catch (err: any) {
+      console.error(err);
+      alert(`Update failed: ${err.message}`);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <>
       <Header />
-      <div className="border-t border-gray-300 mt-2"></div>
+      <div className="border-t border-indigo-300 mt-2"></div>
       <main className="w-[95%] min-h-[85vh] lg:w-full max-w-6xl mx-auto py-10 md:py-16 px-4">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-gray-900 mb-12">
           Manage Your Society Account
@@ -121,8 +166,10 @@ export default function Account() {
             onClick={() => {
               setIsPreview(false);
               setIsEdit(true);
+              setFormData(societyData);
+              setLogoPreview(societyData?.logo || null);
             }}
-            className={`px-5 py-2 rounded-md border transition duration-300 ${
+            className={`px-5 md:text-lg py-1 rounded-md border transition duration-300 hover:cursor-pointer ${
               isEdit
                 ? "bg-indigo-600 text-white border-indigo-600"
                 : "bg-white text-indigo-600 border-indigo-600 hover:bg-indigo-50"
@@ -135,7 +182,7 @@ export default function Account() {
               setIsEdit(false);
               setIsPreview(true);
             }}
-            className={`px-5 py-2 rounded-md border transition duration-300 ${
+            className={`px-5 md:text-lg py-1 rounded-md border transition duration-300 hover:cursor-pointer ${
               isPreview
                 ? "bg-indigo-600 text-white border-indigo-600"
                 : "bg-white text-indigo-600 border-indigo-600 hover:bg-indigo-50"
@@ -144,7 +191,6 @@ export default function Account() {
             Preview
           </button>
         </div>
-
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : error ? (
@@ -206,9 +252,19 @@ export default function Account() {
               <h4 className="text-2xl font-semibold mb-4">Social Links</h4>
               <ul className="space-y-2">
                 {societyData?.social?.map((s: any, i: number) => (
-                  <li key={i} className="text-blue-600 hover:underline">
-                    {s.name}:{" "}
-                    <a href={s.handle} target="_blank">
+                  <li key={i} className="">
+                    <span>{s.name}:&nbsp;</span>
+                    <a
+                      className="text-blue-600 underline"
+                      href={
+                        s.handle.startsWith("http")
+                          ? s.handle
+                          : `https://${s.handle}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {console.log("Handle: ", s.handle)}
                       {s.handle}
                     </a>
                   </li>
@@ -237,31 +293,80 @@ export default function Account() {
                 }}
                 className="space-y-8"
               >
-                <section className="bg-white p-6 rounded-xl shadow-md">
-                  <h3 className="text-2xl font-semibold mb-4 text-center">
+                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                  <h3 className="text-2xl font-bold mb-4 text-center">
                     Edit Society Info
                   </h3>
-                  <div className="grid gap-4">
-                    {["name", "username", "email", "about", "logo"].map(
-                      (field) => (
+                  <div className="grid gap-6">
+                    <div>
+                      <label className="block font-medium mb-1">
+                        Society Logo
+                      </label>
+                      <div className="flex items-center gap-4 mt-2">
+                        {logoPreview && (
+                          <img
+                            src={logoPreview}
+                            alt="Logo Preview"
+                            className="w-24 h-24 object-cover rounded-full border-2 border-gray-200"
+                          />
+                        )}
                         <input
-                          key={field}
-                          type="text"
-                          value={formData?.[field] || ""}
-                          onChange={(e) =>
-                            setFormData((prev: any) => ({
-                              ...prev,
-                              [field]: e.target.value,
-                            }))
-                          }
-                          placeholder={
-                            field.charAt(0).toUpperCase() + field.slice(1)
-                          }
-                          className="p-3 border border-gray-300 rounded-md w-full"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoChange}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         />
-                      ),
-                    )}
-                    <div className="flex items-center gap-3 mt-2">
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">
+                        Society Name
+                      </label>
+                      <input
+                        type="text"
+                        value={formData?.name || ""}
+                        onChange={(e) =>
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            name: e.target.value,
+                          }))
+                        }
+                        placeholder="Enter society name"
+                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">Username</label>
+                      <input
+                        type="text"
+                        value={formData?.username || ""}
+                        onChange={(e) =>
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            username: e.target.value,
+                          }))
+                        }
+                        placeholder="Enter username"
+                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-medium mb-1">About</label>
+                      <textarea
+                        rows={4}
+                        value={formData?.about || ""}
+                        onChange={(e) =>
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            about: e.target.value,
+                          }))
+                        }
+                        placeholder="Tell us about your society"
+                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
+                      />
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                       <label className="text-gray-700 font-medium">
                         Auditions:
                       </label>
@@ -282,101 +387,105 @@ export default function Account() {
                   </div>
                 </section>
 
-                {/* Social Links */}
-                <section className="bg-white p-6 rounded-xl shadow-md">
+                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
                   <h3 className="text-2xl font-semibold mb-4 text-center">
                     Social Links
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     {formData?.social?.map((s: any, idx: number) => (
-                      <div key={idx} className="flex gap-2">
-                        <input
-                          type="text"
+                      <div
+                        key={idx}
+                        className="flex flex-col md:flex-row gap-2 items-start md:items-center"
+                      >
+                        <select
                           value={s.name}
                           onChange={(e) =>
                             handleSocialChange(idx, "name", e.target.value)
                           }
-                          placeholder="Platform"
-                          className="p-2 border rounded-md w-1/3"
-                        />
+                          className="p-2 border border-indigo-300 rounded-md w-full md:w-1/4"
+                        >
+                          <option value="LinkedIn">LinkedIn</option>
+                          <option value="Instagram">Instagram</option>
+                        </select>
                         <input
                           type="text"
                           value={s.handle}
                           onChange={(e) =>
                             handleSocialChange(idx, "handle", e.target.value)
                           }
-                          placeholder="URL"
-                          className="p-2 border rounded-md flex-1"
+                          placeholder="Profile URL"
+                          className="p-2 border rounded-md w-full flex-1"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveSocial(idx)}
-                          className="text-red-600 hover:underline"
+                          className="text-red-500 hover:text-red-700 font-bold text-xl px-2"
                         >
-                          ✕
+                          &times;
                         </button>
                       </div>
                     ))}
                     <button
                       type="button"
                       onClick={handleAddSocial}
-                      className="mt-2 text-blue-600 hover:underline"
+                      className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
                     >
-                      + Add Social
+                      + Add Social Link
                     </button>
                   </div>
                 </section>
-
-                {/* Eligibility */}
-                <section className="bg-white p-6 rounded-xl shadow-md">
+                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
                   <h3 className="text-2xl font-semibold mb-4 text-center">
                     Eligibility Criteria
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {formData?.eligibility?.map((e: any, idx: number) => (
-                      <div key={idx} className="flex gap-2">
+                      <div key={idx} className="flex gap-2 items-center">
                         <input
                           type="text"
                           value={e.name}
                           onChange={(ev) =>
                             handleEligibilityChange(idx, ev.target.value)
                           }
-                          placeholder="Eligibility"
+                          placeholder="e.g., Must be a student of the college"
                           className="p-2 border rounded-md w-full"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveEligibility(idx)}
-                          className="text-red-600 hover:underline"
+                          className="text-red-500 hover:text-red-700 font-bold text-xl px-2"
                         >
-                          ✕
+                          &times;
                         </button>
                       </div>
                     ))}
                     <button
                       type="button"
                       onClick={handleAddEligibility}
-                      className="mt-2 text-blue-600 hover:underline"
+                      className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
                     >
-                      + Add Eligibility
+                      + Add Eligibility Criterion
                     </button>
                   </div>
                 </section>
 
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
                   <button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-semibold transition"
+                    disabled={isUpdating}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed"
                   >
-                    Save Changes
+                    {isUpdating ? "Saving..." : "Save Changes"}
                   </button>
                   <button
                     type="button"
                     onClick={() => {
                       setIsEdit(false);
+                      setIsPreview(true);
                       setFormData(societyData);
+                      setLogoFile(null);
                     }}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-semibold transition"
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer"
                   >
                     Cancel
                   </button>
