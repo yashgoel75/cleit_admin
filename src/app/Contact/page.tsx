@@ -274,7 +274,7 @@ export default function Contact() {
       <div className="bg-gray-50 py-6 px-4">
         <div className="text-center mb-6">
           <h3 className="text-gray-800 md:text-lg font-medium">
-            Prefer socials? Let's connect there too.
+            Prefer socials? Let&apos;s connect there too.
           </h3>
         </div>
         <div className="flex justify-center gap-4 md:gap-6">

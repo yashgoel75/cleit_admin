@@ -51,7 +51,6 @@ const user = new Schema({
   email: String,
   password: String,
   branch: String,
-  section: String,
   batchStart: Number,
   batchEnd: Number,
   wishlist: [{ societyUsername: String }],

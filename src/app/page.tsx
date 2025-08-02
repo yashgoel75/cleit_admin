@@ -35,7 +35,7 @@ export default function Account() {
           </h1>
 
           <p className="mt-6 text-gray-500 text-lg md:text-xl">
-            Your society’s digital home — simple, beautiful, and
+            Your society&apos;s digital home — simple, beautiful, and
             student-focused.
           </p>
 

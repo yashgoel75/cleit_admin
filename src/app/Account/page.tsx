@@ -294,7 +294,7 @@ export default function Account() {
                       {member.designation}
                     </p>
                     <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Mobile:</span>{" "}
+                      <span className="font-medium">Mobile:</span>&nbsp;
                       {member.mobile}
                     </p>
                     <p className="text-base text-gray-600">
@@ -344,18 +344,18 @@ export default function Account() {
 
                           {event.type && (
                             <p className="text-base text-gray-600 mb-1">
-                              <span className="font-medium">Type:</span>{" "}
+                              <span className="font-medium">Type:</span>&nbsp;
                               {event.type}
                             </p>
                           )}
 
                           <p className="text-base text-gray-600 mb-1">
-                            <span className="font-medium">Venue:</span>{" "}
+                            <span className="font-medium">Venue:</span>&nbsp;
                             {event.venue}
                           </p>
 
                           <p className="text-base text-gray-600 mb-1">
-                            <span className="font-medium">Time:</span>{" "}
+                            <span className="font-medium">Time:</span>&nbsp;
                             {event.time}
                           </p>
 
@@ -363,13 +363,13 @@ export default function Account() {
                           event.endDate !== event.startDate ? (
                             <>
                               <p className="text-base text-gray-600 mb-1">
-                                <span className="font-medium">Start:</span>{" "}
+                                <span className="font-medium">Start:</span>&nbsp;
                                 {new Date(event.startDate).toLocaleDateString(
                                   "en-IN",
                                 )}
                               </p>
                               <p className="text-base text-gray-600 mb-1">
-                                <span className="font-medium">End:</span>{" "}
+                                <span className="font-medium">End:</span>&nbsp;
                                 {new Date(event.endDate).toLocaleDateString(
                                   "en-IN",
                                 )}
@@ -377,7 +377,7 @@ export default function Account() {
                             </>
                           ) : (
                             <p className="text-base text-gray-600 mb-1">
-                              <span className="font-medium">Date:</span>{" "}
+                              <span className="font-medium">Date:</span>&nbsp;
                               {new Date(event.startDate).toLocaleDateString(
                                 "en-IN",
                               )}
@@ -385,7 +385,7 @@ export default function Account() {
                           )}
 
                           <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
-                            <span className="font-medium">About:</span>{" "}
+                            <span className="font-medium">About:</span>&nbsp;
                             {event.about}
                           </p>
 

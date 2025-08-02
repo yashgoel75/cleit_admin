@@ -271,17 +271,17 @@ export default function Events() {
                   {event.endDate && event.endDate !== event.startDate ? (
                     <>
                       <p className="text-base text-gray-600 mb-1">
-                        <span className="font-medium">Start:</span>{" "}
+                        <span className="font-medium">Start:</span>&nbsp;
                         {new Date(event.startDate).toLocaleDateString("en-IN")}
                       </p>
                       <p className="text-base text-gray-600 mb-1">
-                        <span className="font-medium">End:</span>{" "}
+                        <span className="font-medium">End:</span>&nbsp;
                         {new Date(event.endDate).toLocaleDateString("en-IN")}
                       </p>
                     </>
                   ) : (
                     <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Date:</span>{" "}
+                      <span className="font-medium">Date:</span>&nbsp;
                       {new Date(event.startDate).toLocaleDateString("en-IN")}
                     </p>
                   )}
