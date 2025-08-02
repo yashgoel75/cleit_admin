@@ -12,9 +12,50 @@ import instagram from "@/assets/Instagram.png";
 import Image from "next/image";
 
 export default function Account() {
+  interface EligibilityCriterion {
+    name: string;
+  }
+
+  interface SocialLink {
+    name: "LinkedIn" | "Instagram" | string;
+    handle: string;
+  }
+
+  interface TeamMember {
+    name: string;
+    designation: string;
+    mobile: string;
+    email: string;
+  }
+
+  interface Event {
+    _id: string;
+    title: string;
+    type?: string;
+    venue: string;
+    time: string;
+    startDate: string;
+    endDate?: string;
+    about: string;
+    socialGroup?: string;
+  }
+
+  interface Society {
+    name: string;
+    username: string;
+    email: string;
+    logo: string;
+    website: string;
+    about: string;
+    auditionOpen: boolean;
+    team: TeamMember[];
+    events: Event[];
+    social: SocialLink[];
+    eligibility: EligibilityCriterion[];
+  }
   const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(false);
-  const [societyData, setSocietyData] = useState<any>(null);
+  const [societyData, setSocietyData] = useState<Society | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -25,6 +66,7 @@ export default function Account() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user?.email) {
@@ -53,8 +95,12 @@ export default function Account() {
       setFormData(data.society);
       setLogoPreview(data.society?.logo || null);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Error");
+      }
     } finally {
       setLoading(false);
     }
@@ -154,9 +200,14 @@ export default function Account() {
       setSuccess(false);
       setUsernameAvailable(false);
       await getSocietyByEmail(updatedData.email);
-    } catch (err: any) {
-      console.error(err);
-      alert(`Update failed: ${err.message}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err);
+        alert(`Update failed: ${err.message}`);
+      } else {
+        console.error("Error");
+        alert(`Update failed: Error`);
+      }
     } finally {
       setIsUpdating(false);
     }
@@ -281,7 +332,7 @@ export default function Account() {
                 </svg>
               </h4>
               <div className="grid md:grid-cols-2 gap-6">
-                {societyData?.team?.map((member: any, index: number) => (
+                {societyData?.team?.map((member: TeamMember, index: number) => (
                   <div
                     key={index}
                     className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
@@ -322,17 +373,17 @@ export default function Account() {
               </h4>
 
               <div>
-                {societyData?.events?.length > 0 ? (
+                {societyData?.events?.length || 0 > 0 ? (
                   <div
                     className={`grid gap-6 sm:grid-cols-2 ${
-                      societyData.events.length === 1
+                      societyData?.events.length === 1
                         ? "lg:grid-cols-1"
-                        : societyData.events.length === 2
+                        : societyData?.events.length === 2
                           ? "lg:grid-cols-2"
                           : "lg:grid-cols-3"
                     }`}
                   >
-                    {societyData.events.map((event: any) => (
+                    {societyData?.events.map((event: Event) => (
                       <div
                         key={event._id}
                         className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"
@@ -363,7 +414,8 @@ export default function Account() {
                           event.endDate !== event.startDate ? (
                             <>
                               <p className="text-base text-gray-600 mb-1">
-                                <span className="font-medium">Start:</span>&nbsp;
+                                <span className="font-medium">Start:</span>
+                                &nbsp;
                                 {new Date(event.startDate).toLocaleDateString(
                                   "en-IN",
                                 )}
@@ -419,7 +471,7 @@ export default function Account() {
             <section>
               <h4 className="text-2xl font-semibold mb-4">Social Links</h4>
               <ul className="space-y-2">
-                {societyData?.social?.map((s: any, i: number) => {
+                {societyData?.social?.map((s: SocialLink, i: number) => {
                   const icon = s.name === "LinkedIn" ? linkedin : instagram;
                   const handleUrl = s.handle.startsWith("http")
                     ? s.handle
@@ -458,11 +510,13 @@ export default function Account() {
                 Eligibility Criteria
               </h4>
 
-              {societyData?.eligibility?.length > 0 ? (
+              {societyData?.eligibility?.length || 0 > 0 ? (
                 <ul className="list-disc list-inside text-gray-700 space-y-1">
-                  {societyData.eligibility.map((e: any, i: number) => (
-                    <li key={i}>{e.name}</li>
-                  ))}
+                  {societyData?.eligibility.map(
+                    (e: EligibilityCriterion, i: number) => (
+                      <li key={i}>{e.name}</li>
+                    ),
+                  )}
                 </ul>
               ) : (
                 <p className="text-gray-500 italic">
