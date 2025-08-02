@@ -8,13 +8,20 @@ import { auth } from "@/lib/firebase";
 import Footer from "@/app/Footer/page";
 
 export default function Account() {
+  interface TeamMember {
+    name: string;
+    designation: string;
+    mobile: string;
+    email: string;
+  }
+
   const [displayName, setDisplayName] = useState("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [team, setTeam] = useState([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TeamMember>({
     name: "",
     designation: "",
     mobile: "",
@@ -34,8 +41,12 @@ export default function Account() {
       setTeam(data.society.team);
       setDisplayName(data.society.name);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -99,7 +110,7 @@ export default function Account() {
     }
   };
 
-  const handleEdit = (member: any) => {
+  const handleEdit = (member: TeamMember) => {
     setFormData(member);
     setEditingEmail(member.email);
     setIsAdding(false);
@@ -140,7 +151,7 @@ export default function Account() {
                 <input
                   key={field}
                   type="text"
-                  value={(formData as any)[field]}
+                  value={formData[field as keyof TeamMember]}
                   onChange={(e) =>
                     setFormData({ ...formData, [field]: e.target.value })
                   }
@@ -191,7 +202,7 @@ export default function Account() {
                   : "lg:grid-cols-3"
             }`}
           >
-            {team.map((member: any) => (
+            {team.map((member: TeamMember) => (
               <div
                 key={member.email}
                 className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"

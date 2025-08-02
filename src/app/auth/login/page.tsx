@@ -290,7 +290,7 @@ export default function Login() {
           ) : null}
         </div>
         <div className="text-center">
-          Don't have an account?&nbsp;
+          Don&apos;t have an account?&nbsp;
           <Link href={"/auth/register"}>
             <u>Create one now.</u>
           </Link>

@@ -7,6 +7,23 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
+export default function Events() {
+  interface EventData {
+  _id: string;
+  title: string;
+  type?: string;
+  startDate: string;
+  endDate?: string;
+  venue: string;
+  time: string;
+  about: string;
+  socialGroup?: string;
+}
+
+type EventFormFields = {
+  [K in keyof Omit<EventData, "_id">]: string;
+};
+
 const formFields = [
   { name: "title", label: "Event Title", type: "text" },
   {
@@ -29,10 +46,10 @@ const formFields = [
     type: "text",
   },
 ];
-
-export default function Events() {
+  
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]);
+
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,8 +64,8 @@ export default function Events() {
     about: "",
     socialGroup: "",
   };
-
-  const [eventFormData, setEventFormData] = useState(initialFormState);
+  const [eventFormData, setEventFormData] =
+    useState<EventFormFields>(initialFormState);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -63,8 +80,12 @@ export default function Events() {
       setEvents(data.society.events || []);
       setDisplayName(data.society.name);
       setError(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -188,7 +209,7 @@ export default function Events() {
                       id={field.name}
                       name={field.name}
                       rows={4}
-                      value={(eventFormData as any)[field.name]}
+                      value={eventFormData[field.name as keyof EventFormFields]}
                       onChange={(e) =>
                         setEventFormData({
                           ...eventFormData,
