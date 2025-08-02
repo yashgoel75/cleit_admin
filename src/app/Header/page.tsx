@@ -142,7 +142,7 @@ export default function Header() {
       {isMobileNavOpen && (
         <div className="lg:hidden fixed inset-0 bg-white z-40 px-5 py-4">
           <div className="flex justify-between items-center mb-6">
-            <Link href={"/"}>
+            <Link className="focus:outline-none" href={"/"}>
               <Image src={logo} width={140} alt="Cleit" />
             </Link>
             <button
@@ -215,7 +215,7 @@ export default function Header() {
 
       <header className="w-full px-5 py-4 flex items-center justify-between bg-white border-b border-gray-300 sticky top-0 z-30">
         <div className="flex items-center gap-4">
-          <Link href={"/"}>
+          <Link className="focus:outline-none" href={"/"}>
             <Image src={logo} width={isMobile ? 140 : 200} alt="Cleit" />
           </Link>
         </div>
