@@ -7,8 +7,13 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import linkedin from "@/assets/LinkedIn.png";
+import instagram from "@/assets/Instagram.png";
+import Image from "next/image";
 
 export default function Account() {
+  const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState(false);
   const [societyData, setSocietyData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +131,7 @@ export default function Account() {
         }
         updatedData.logo = data.secure_url;
       }
-
+      if (usernameAlreadyTaken) return;
       const res = await fetch("/api/society/account", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -153,6 +158,25 @@ export default function Account() {
       setIsUpdating(false);
     }
   };
+
+  async function isUsernameAvailable() {
+    try {
+      const res = await fetch(
+        `/api/register/society?username=${formData.username}`,
+      );
+      const data = await res.json();
+
+      if (data.usernameExists) {
+        setUsernameAvailable(false);
+        setUsernameAlreadyTaken(true);
+      } else {
+        setUsernameAlreadyTaken(false);
+        setUsernameAvailable(true);
+      }
+    } catch (error) {
+      console.error("Error checking username:", error);
+    }
+  }
 
   return (
     <>
@@ -201,7 +225,7 @@ export default function Account() {
               <img
                 src={societyData?.logo}
                 alt={`${societyData?.name} logo`}
-                className="mx-auto w-32 h-32 object-cover rounded-full border shadow"
+                className="mx-auto w-32 h-32 object-cover rounded-full border-2 border-indigo-700 shadow"
               />
               <h3 className="text-3xl font-bold mt-4">{societyData?.name}</h3>
               <p className="text-gray-600 text-lg">@{societyData?.username}</p>
@@ -259,9 +283,45 @@ export default function Account() {
                   </div>
                 ))}
               </div>
-                </section>
-                
-                <section>
+            </section>
+
+            <section>
+              <h4 className="text-2xl font-semibold mb-4">Social Links</h4>
+              <ul className="space-y-2">
+                {societyData?.social?.map((s: any, i: number) => {
+                  const icon = s.name === "LinkedIn" ? linkedin : instagram;
+                  const handleUrl = s.handle.startsWith("http")
+                    ? s.handle
+                    : `https://${s.handle}`;
+
+                  const username = s.handle
+                    .replace(/\/+$/, "")
+                    .split("/")
+                    .pop();
+
+                  return (
+                    <li key={i} className="flex items-center gap-2 md:gap-3">
+                      <Image
+                        src={icon}
+                        width={24}
+                        height={24}
+                        alt={`${s.name} icon`}
+                      />
+                      <span className="font-medium">{s.name}:</span>
+                      <a
+                        className="text-blue-600 underline break-all"
+                        href={handleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        @{username}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+            <section>
               <h4 className="flex items-center text-2xl font-semibold mb-4">
                 Events&nbsp;
                 <svg
@@ -276,69 +336,68 @@ export default function Account() {
                   <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
                 </svg>
               </h4>
-              <div className="grid md:grid-cols-2 gap-6">
-                {societyData?.events?.map((member: any, index: number) => (
-                  <div
-                    key={index}
-                    className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
-                  >
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                      {member.name}
-                    </h3>
-                    <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Designation:&nbsp;</span>
-                      {member.designation}
-                    </p>
-                    <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Mobile:</span>{" "}
-                      {member.mobile}
-                    </p>
-                    <p className="text-base text-gray-600">
-                      <span className="font-medium">Email:</span> {member.email}
-                    </p>
+              <div className="">
+                {societyData?.events?.length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {societyData.events.map((event: any, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
+                      >
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                          {event.title}
+                        </h3>
+
+                        <p className="text-base text-gray-600 mb-1">
+                          <span className="font-medium">Date:</span>{" "}
+                          {event.date}
+                        </p>
+                        <p className="text-base text-gray-600 mb-1">
+                          <span className="font-medium">Time:</span>{" "}
+                          {event.time}
+                        </p>
+                        <p className="text-base text-gray-600 mb-1">
+                          <span className="font-medium">Venue:</span>{" "}
+                          {event.venue}
+                        </p>
+
+                        {event.description && (
+                          <p className="text-base text-gray-600 mt-2">
+                            {event.description}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <div className="text-gray-500 italic">
+                    No scheduled events right now. Stay tuned!
+                  </div>
+                )}
               </div>
             </section>
 
-            <section>
-              <h4 className="text-2xl font-semibold mb-4">Social Links</h4>
-              <ul className="space-y-2">
-                {societyData?.social?.map((s: any, i: number) => (
-                  <li key={i} className="">
-                    <span>{s.name}:&nbsp;</span>
-                    <a
-                      className="text-blue-600 underline"
-                      href={
-                        s.handle.startsWith("http")
-                          ? s.handle
-                          : `https://${s.handle}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {console.log("Handle: ", s.handle)}
-                      {s.handle}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section>
+            <section className="mt-8">
               <h4 className="text-2xl font-semibold mb-4">
                 Eligibility Criteria
               </h4>
-              <ul className="list-disc list-inside text-gray-700">
-                {societyData?.eligibility?.map((e: any, i: number) => (
-                  <li key={i}>{e.name}</li>
-                ))}
-              </ul>
+
+              {societyData?.eligibility?.length > 0 ? (
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  {societyData.eligibility.map((e: any, i: number) => (
+                    <li key={i}>{e.name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-500 italic">
+                  No specific eligibility criteria mentioned.
+                </p>
+              )}
             </section>
           </div>
         ) : (
           <>
-            <div className="space-y-10">
+            <div className="space-y-10 text-base md:text-lg">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -355,19 +414,19 @@ export default function Account() {
                       <label className="block font-medium mb-1">
                         Society Logo
                       </label>
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex-1 md:flex items-center gap-4 mt-2">
                         {logoPreview && (
                           <img
                             src={logoPreview}
                             alt="Logo Preview"
-                            className="w-24 h-24 object-cover rounded-full border-2 border-gray-200"
+                            className="w-24 h-24 object-cover rounded-full border-2 border-indigo-700"
                           />
                         )}
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleLogoChange}
-                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                          className="mt-2 md:mt-0 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         />
                       </div>
                     </div>
@@ -385,23 +444,47 @@ export default function Account() {
                           }))
                         }
                         placeholder="Enter society name"
-                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
                       />
                     </div>
                     <div>
                       <label className="block font-medium mb-1">Username</label>
-                      <input
-                        type="text"
-                        value={formData?.username || ""}
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            username: e.target.value,
-                          }))
-                        }
-                        placeholder="Enter username"
-                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
-                      />
+                      <div className="flex gap-1">
+                        <input
+                          type="text"
+                          value={formData?.username || ""}
+                          onChange={(e) => {
+                            setFormData((prev: any) => ({
+                              ...prev,
+                              username: e.target.value,
+                            }));
+                            setUsernameAlreadyTaken(false);
+                            setUsernameAvailable(false);
+                          }}
+                          placeholder="Enter username"
+                          className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            isUsernameAvailable();
+                          }}
+                          className="text-center rounded-md px-3 py-1 bg-indigo-500 hover:bg-indigo-700 hover:cursor-pointer text-white"
+                        >
+                          Check
+                        </button>
+                      </div>
+                      {usernameAvailable ? (
+                        <span className="text-green-700 text-sm ml-1">
+                          Username Available
+                        </span>
+                      ) : null}
+                      {usernameAlreadyTaken ? (
+                        <span className="text-red-700 text-sm ml-1">
+                          Username Already Taken
+                        </span>
+                      ) : null}
                     </div>
                     <div>
                       <label className="block font-medium mb-1">About</label>
@@ -415,11 +498,11 @@ export default function Account() {
                           }))
                         }
                         placeholder="Tell us about your society"
-                        className="px-3 py-2 border border-indigo-300 rounded-md w-full"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
                       />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <label className="text-gray-700 font-medium">
                         Auditions:
                       </label>
@@ -431,7 +514,7 @@ export default function Account() {
                             auditionOpen: e.target.value === "true",
                           }))
                         }
-                        className="p-2 border rounded-md"
+                        className="py-1 font-bold border-b border-gray-300 focus:outline-none"
                       >
                         <option value="true">Open</option>
                         <option value="false">Closed</option>
@@ -440,7 +523,7 @@ export default function Account() {
                   </div>
                 </section>
 
-                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                <section className="bg-white p-4 sm:p-4 rounded-xl shadow-md">
                   <h3 className="text-2xl font-semibold mb-4 text-center">
                     Social Links
                   </h3>
@@ -448,14 +531,14 @@ export default function Account() {
                     {formData?.social?.map((s: any, idx: number) => (
                       <div
                         key={idx}
-                        className="flex flex-col md:flex-row gap-2 items-start md:items-center"
+                        className="flex shadow-md rounded-lg p-2 justify-center flex-col md:flex-row gap-2 items-start md:items-center"
                       >
                         <select
                           value={s.name}
                           onChange={(e) =>
                             handleSocialChange(idx, "name", e.target.value)
                           }
-                          className="p-2 border border-indigo-300 rounded-md w-full md:w-1/4"
+                          className="px-3 py-2 border-b border-gray-200 w-full md:w-1/4 focus:outline-none"
                         >
                           <option value="LinkedIn">LinkedIn</option>
                           <option value="Instagram">Instagram</option>
@@ -467,14 +550,28 @@ export default function Account() {
                             handleSocialChange(idx, "handle", e.target.value)
                           }
                           placeholder="Profile URL"
-                          className="p-2 border rounded-md w-full flex-1"
+                          className="w-full border-b border-gray-200 px-4 py-2  focus:outline-none focus:ring-b focus:ring-indigo-500"
                         />
+                        <div className="text-center px-4 text-red-500 font-medium md:hidden">
+                          <button onClick={() => handleRemoveSocial(idx)}>
+                            Delete
+                          </button>
+                        </div>
                         <button
                           type="button"
+                          className="hidden md:flex mr-4 hover:cursor-pointer"
                           onClick={() => handleRemoveSocial(idx)}
-                          className="text-red-500 hover:text-red-700 font-bold text-xl px-2"
                         >
-                          &times;
+                          <svg
+                            className="rounded-full bg-white p-0.5 flex items-center"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#8C1A10"
+                          >
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                          </svg>
                         </button>
                       </div>
                     ))}
@@ -493,7 +590,10 @@ export default function Account() {
                   </h3>
                   <div className="space-y-3">
                     {formData?.eligibility?.map((e: any, idx: number) => (
-                      <div key={idx} className="flex gap-2 items-center">
+                      <div
+                        key={idx}
+                        className="shadow-md rounded-lg p-2 flex-1 md:flex gap-2 items-center shadow"
+                      >
                         <input
                           type="text"
                           value={e.name}
@@ -501,14 +601,28 @@ export default function Account() {
                             handleEligibilityChange(idx, ev.target.value)
                           }
                           placeholder="e.g., Must be a student of the college"
-                          className="p-2 border rounded-md w-full"
+                          className="w-full border-b border-gray-300 px-4 py-2 focus:outline-none focus:ring-b focus:ring-indigo-200"
                         />
+                        <div className="px-4 mt-2 text-red-500 font-medium md:hidden">
+                          <button onClick={() => handleRemoveEligibility(idx)}>
+                            Delete
+                          </button>
+                        </div>
                         <button
                           type="button"
+                          className="hidden md:flex mr-4 hover:cursor-pointer"
                           onClick={() => handleRemoveEligibility(idx)}
-                          className="text-red-500 hover:text-red-700 font-bold text-xl px-2"
                         >
-                          &times;
+                          <svg
+                            className="rounded-full bg-white p-0.5 flex items-center"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#8C1A10"
+                          >
+                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                          </svg>
                         </button>
                       </div>
                     ))}
