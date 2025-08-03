@@ -1,6 +1,6 @@
 import "./page.css";
 import Header from "../Header/page";
-import Member from "./Member/page";
+import Member from "./Member/member";
 import Footer from "../Footer/page";
 
 import yashgoel from "@/assets/team/yash_goel.png";
