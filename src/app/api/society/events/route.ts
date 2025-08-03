@@ -3,23 +3,23 @@ import { Society } from "../../../../../db/schema";
 import { Types } from "mongoose";
 
 interface eventContact {
-  name: String,
-  designation: String,
-  mobile: String,
-  email: String,
+  name: string,
+  designation: string,
+  mobile: string,
+  email: string,
 }
 
 interface event {
   _id: Types.ObjectId;
-  title: String,
-  type: String,
-  startDate: String,
-  endDate: String,
-  venue: String,
-  time: String,
-  about: String,
+  title: string,
+  type: string,
+  startDate: string,
+  endDate: string,
+  venue: string,
+  time: string,
+  about: string,
   contact: [eventContact],
-  socialGroup: String,
+  socialGroup: string,
 }
 
 export async function GET(req: NextRequest) {
