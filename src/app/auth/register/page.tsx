@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Tooltip from "@/app/Tooltip/page";
+import Tooltip from "@/app/Tooltip/tooltip";
 import Image from "next/image";
 import logo from "@/assets/cleit.png";
 import Footer from "../Footer/page";
