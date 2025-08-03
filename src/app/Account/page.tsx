@@ -568,32 +568,32 @@ export default function Account() {
               className="space-y-8"
             >
               <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-                <h3 className="text-2xl font-bold mb-4 text-center">
+                <h3 className="text-2xl font-bold mb-4 text-center text-gray-800">
                   Edit Society Info
                 </h3>
                 <div className="grid gap-6">
                   <div>
-                    <label className="block font-medium mb-1">
+                    <label className="block font-medium mb-1 text-gray-700">
                       Society Logo
                     </label>
-                    <div className="flex-1 md:flex items-center gap-4 mt-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
                       {logoPreview && (
                         <img
                           src={logoPreview}
                           alt="Logo Preview"
-                          className="w-24 h-24 object-cover rounded-full border-2 border-indigo-700"
+                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full border-2 border-indigo-700"
                         />
                       )}
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleLogoChange}
-                        className="mt-2 md:mt-0 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        className="mt-2 sm:mt-0 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block font-medium mb-1">
+                    <label className="block font-medium mb-1 text-gray-700">
                       Society Name
                     </label>
                     <input
@@ -607,30 +607,32 @@ export default function Account() {
                         )
                       }
                       placeholder="Enter society name"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                      className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
                     />
                   </div>
                   <div>
-                    <label className="block font-medium mb-1">Website</label>
-                    <div className="flex gap-1">
-                      <input
-                        type="text"
-                        value={formData?.website || ""}
-                        onChange={(e) =>
-                          setFormData(
-                            formData
-                              ? { ...formData, website: e.target.value }
-                              : null,
-                          )
-                        }
-                        placeholder="Enter website"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                      />
-                    </div>
+                    <label className="block font-medium mb-1 text-gray-700">
+                      Website
+                    </label>
+                    <input
+                      type="text"
+                      value={formData?.website || ""}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? { ...formData, website: e.target.value }
+                            : null,
+                        )
+                      }
+                      placeholder="Enter website"
+                      className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
+                    />
                   </div>
                   <div>
-                    <label className="block font-medium mb-1">Username</label>
-                    <div className="flex gap-1">
+                    <label className="block font-medium mb-1 text-gray-700">
+                      Username
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
                         value={formData?.username || ""}
@@ -644,7 +646,7 @@ export default function Account() {
                           setUsernameAvailable(false);
                         }}
                         placeholder="Enter username"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                        className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
                       />
                       <button
                         type="button"
@@ -652,24 +654,24 @@ export default function Account() {
                           e.preventDefault();
                           isUsernameAvailable();
                         }}
-                        className="text-center rounded-md px-3 py-1 bg-indigo-500 hover:bg-indigo-700 hover:cursor-pointer text-white"
+                        className="w-full sm:w-auto px-4 py-2 text-center rounded-md bg-indigo-500 hover:bg-indigo-700 text-white font-medium transition-colors"
                       >
                         Check
                       </button>
                     </div>
-                    {usernameAvailable ? (
-                      <span className="text-green-700 text-sm ml-1">
+                    {usernameAvailable && (
+                      <span className="block text-green-700 text-sm mt-1">
                         Username Available
                       </span>
-                    ) : null}
-                    {usernameAlreadyTaken ? (
-                      <span className="text-red-700 text-sm ml-1">
+                    )}
+                    {usernameAlreadyTaken && (
+                      <span className="block text-red-700 text-sm mt-1">
                         Username Already Taken
                       </span>
-                    ) : null}
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-700 font-medium">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <label className="text-gray-700 font-medium whitespace-nowrap">
                       Category:
                     </label>
                     <select
@@ -677,14 +679,11 @@ export default function Account() {
                       onChange={(e) =>
                         setFormData(
                           formData
-                            ? {
-                                ...formData,
-                                type: e.target.value,
-                              }
+                            ? { ...formData, type: e.target.value }
                             : null,
                         )
                       }
-                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 text-sm sm:text-base"
                     >
                       <option>Academic & Technical</option>
                       <option>Cultural & Arts</option>
@@ -696,7 +695,9 @@ export default function Account() {
                     </select>
                   </div>
                   <div>
-                    <label className="block font-medium mb-1">About</label>
+                    <label className="block font-medium mb-1 text-gray-700">
+                      About
+                    </label>
                     <textarea
                       rows={4}
                       value={formData?.about || ""}
@@ -708,11 +709,11 @@ export default function Account() {
                         )
                       }
                       placeholder="Tell us about your society"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                      className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
                     />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-700 font-medium">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <label className="text-gray-700 font-medium whitespace-nowrap">
                       Auditions:
                     </label>
                     <select
@@ -727,14 +728,14 @@ export default function Account() {
                             : null,
                         )
                       }
-                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 text-sm sm:text-base"
                     >
                       <option value="true">Open</option>
                       <option value="false">Closed</option>
                     </select>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-700 font-medium">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <label className="text-gray-700 font-medium whitespace-nowrap">
                       Centralized Society:
                     </label>
                     <select
@@ -749,7 +750,7 @@ export default function Account() {
                             : null,
                         )
                       }
-                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 text-sm sm:text-base"
                     >
                       <option value="true">Yes</option>
                       <option value="false">No</option>
@@ -757,22 +758,22 @@ export default function Account() {
                   </div>
                 </div>
               </section>
-              <section className="bg-white p-4 sm:p-4 rounded-xl shadow-md">
-                <h3 className="text-2xl font-semibold mb-4 text-center">
+              <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                <h3 className="text-2xl font-semibold mb-4 text-center text-gray-800">
                   Social Links
                 </h3>
                 <div className="space-y-4">
                   {formData?.social?.map((s: SocialLink, idx: number) => (
                     <div
                       key={idx}
-                      className="flex shadow-md rounded-lg p-2 justify-center flex-col md:flex-row gap-2 items-start md:items-center"
+                      className="flex flex-col sm:flex-row gap-2 items-start sm:items-center shadow-md rounded-lg p-3"
                     >
                       <select
                         value={s.name}
                         onChange={(e) =>
                           handleSocialChange(idx, "name", e.target.value)
                         }
-                        className="px-3 py-2 border-b border-gray-200 w-full md:w-1/4 focus:outline-none"
+                        className="w-full sm:w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 text-sm sm:text-base"
                       >
                         <option value="LinkedIn">LinkedIn</option>
                         <option value="Instagram">Instagram</option>
@@ -784,50 +785,36 @@ export default function Account() {
                           handleSocialChange(idx, "handle", e.target.value)
                         }
                         placeholder="Profile URL"
-                        className="w-full border-b border-gray-200 px-4 py-2 focus:outline-none focus:ring-b focus:ring-indigo-500"
+                        className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
                       />
-                      <div className="text-center px-4 text-red-500 font-medium md:hidden">
-                        <button onClick={() => handleRemoveSocial(idx)}>
-                          Delete
-                        </button>
-                      </div>
                       <button
                         type="button"
-                        className="hidden md:flex mr-4 hover:cursor-pointer"
                         onClick={() => handleRemoveSocial(idx)}
+                        className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center"
                       >
-                        <svg
-                          className="rounded-full bg-white p-0.5 flex items-center"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#8C1A10"
-                        >
-                          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                        </svg>
+                        Delete
                       </button>
                     </div>
                   ))}
                   <button
                     type="button"
                     onClick={handleAddSocial}
-                    className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
+                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors"
                   >
                     + Add Social Link
                   </button>
                 </div>
               </section>
               <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-                <h3 className="text-2xl font-semibold mb-4 text-center">
+                <h3 className="text-2xl font-semibold mb-4 text-center text-gray-800">
                   Eligibility Criteria
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {formData?.eligibility?.map(
                     (e: EligibilityCriterion, idx: number) => (
                       <div
                         key={idx}
-                        className="shadow-md rounded-lg p-2 flex-1 md:flex gap-2 items-center shadow"
+                        className="flex flex-col sm:flex-row gap-2 items-start sm:items-center shadow-md rounded-lg p-3"
                       >
                         <input
                           type="text"
@@ -836,28 +823,14 @@ export default function Account() {
                             handleEligibilityChange(idx, ev.target.value)
                           }
                           placeholder="e.g., Must be a student of the college"
-                          className="w-full border-b border-gray-300 px-4 py-2 focus:outline-none focus:ring-b focus:ring-indigo-200"
+                          className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
                         />
-                        <div className="px-4 mt-2 text-red-500 font-medium md:hidden">
-                          <button onClick={() => handleRemoveEligibility(idx)}>
-                            Delete
-                          </button>
-                        </div>
                         <button
                           type="button"
-                          className="hidden md:flex mr-4 hover:cursor-pointer"
                           onClick={() => handleRemoveEligibility(idx)}
+                          className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center"
                         >
-                          <svg
-                            className="rounded-full bg-white p-0.5 flex items-center"
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="24px"
-                            viewBox="0 -960 960 960"
-                            width="24px"
-                            fill="#8C1A10"
-                          >
-                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                          </svg>
+                          Delete
                         </button>
                       </div>
                     ),
@@ -865,7 +838,7 @@ export default function Account() {
                   <button
                     type="button"
                     onClick={handleAddEligibility}
-                    className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
+                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors"
                   >
                     + Add Eligibility Criterion
                   </button>
@@ -875,7 +848,7 @@ export default function Account() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className={`bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed ${
+                  className={`w-full sm:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold transition-colors disabled:bg-indigo-300 disabled:cursor-not-allowed ${
                     isUpdating || success ? "opacity-50" : ""
                   }`}
                 >
@@ -893,7 +866,7 @@ export default function Account() {
                     setFormData(societyData);
                     setLogoFile(null);
                   }}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-semibold transition-colors"
                 >
                   Cancel
                 </button>
