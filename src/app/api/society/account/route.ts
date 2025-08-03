@@ -1,8 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import { Society } from "../../../../../db/schema";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
+import { register } from "@/instrumentation";
 
 export async function PATCH(req: NextRequest) {
+  await register();
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });

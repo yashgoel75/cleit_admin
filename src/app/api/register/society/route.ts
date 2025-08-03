@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
 import argon2 from "argon2";
+import { register } from "@/instrumentation";
 
 export async function GET(req: NextRequest) {
   try {
+    await register();
     const { searchParams } = new URL(req.url);
     const username = searchParams.get("username");
     const email = searchParams.get("email");
@@ -42,6 +44,7 @@ interface team {
 export async function POST(req: NextRequest) {
   const { name, username, email, password } = (await req.json()) as team;
   try {
+    await register();
     if (!name || !username || !email || !password) {
       console.error("Missing entries");
       return NextResponse.json("Invalid Entry");

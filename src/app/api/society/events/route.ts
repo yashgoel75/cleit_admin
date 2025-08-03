@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
 import { Types } from "mongoose";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
+import { register } from "@/instrumentation";
 
 interface eventContact {
   name: string,
@@ -25,6 +26,7 @@ interface event {
 
 export async function GET(req: NextRequest) {
   try {
+    await register();
     const { searchParams } = new URL(req.url);
     const societyEmail = searchParams.get("email");
 
@@ -48,6 +50,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   // Auth
+  await register();
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
@@ -88,6 +91,7 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   // Auth
+  await register();
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
@@ -131,6 +135,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   // Auth
+  await register();
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });

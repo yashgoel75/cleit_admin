@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
+import { register } from "@/instrumentation";
 
 interface member {
   name: string,
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    await register();
     const { societyEmail, newMember } = await req.json();
 
     if (!societyEmail || !newMember) {
@@ -56,6 +58,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    await register();
     const { societyEmail, memberEmail, updates } = await req.json();
 
     if (!societyEmail || !memberEmail || typeof updates !== "object") {
@@ -102,6 +105,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    await register();
     const { societyEmail, memberEmail } = await req.json();
 
     if (!societyEmail || !memberEmail) {
@@ -133,6 +137,7 @@ export async function DELETE(req: NextRequest) {
 // GET: Fetch society by email (to get team)
 export async function GET(req: NextRequest) {
   try {
+    await register();
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email")?.toLowerCase();
 
