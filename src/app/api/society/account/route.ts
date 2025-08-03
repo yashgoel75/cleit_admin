@@ -13,7 +13,3 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ success: true, society: updatedSociety });
 }
-
-export function handler() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-}
