@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Footer from "@/app/Footer/page";
+import { getFirebaseToken } from "@/utils";
 
 export default function Account() {
   interface TeamMember {
@@ -72,10 +73,13 @@ export default function Account() {
       : { societyEmail: currentUser.email, newMember: formData };
 
     const method = editingEmail ? "PATCH" : "POST";
-
+    const token = await getFirebaseToken();
     const res = await fetch("/api/society/team", {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+       },
       body: JSON.stringify(body),
     });
 
@@ -96,9 +100,13 @@ export default function Account() {
 
   const handleDelete = async (email: string) => {
     if (!currentUser) return;
+    const token = await getFirebaseToken();
     const res = await fetch("/api/society/team", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+       },
       body: JSON.stringify({
         societyEmail: currentUser.email,
         memberEmail: email,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
 import { Types } from "mongoose";
+import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 interface eventContact {
   name: string,
@@ -46,6 +47,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, newEvent } = await req.json();
 
@@ -76,6 +87,16 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, eventId, updates } = await req.json();
 
@@ -109,6 +130,16 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, eventId } = await req.json();
 

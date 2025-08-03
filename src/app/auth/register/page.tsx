@@ -5,7 +5,10 @@ import Tooltip from "@/app/Tooltip/tooltip";
 import Image from "next/image";
 import logo from "@/assets/cleit.png";
 import Footer from "../Footer/page";
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -35,15 +38,15 @@ export default function Society() {
   }, []);
 
   useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          router.push("/Account");
-        }
-      });
-  
-      return () => unsubscribe();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/Account");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -81,6 +84,8 @@ export default function Society() {
     if (name === "email") {
       setIsEmailEmpty(false);
       setEmailAlreadyTaken(false);
+      setOtpSending(false);
+      setOtpSent(false);
     }
     if (name == "password") {
       setIsPasswordEmpty(false);
@@ -146,7 +151,8 @@ export default function Society() {
       console.error("Error checking username:", error);
     }
   }
-
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   async function sendEmailOtp() {
     try {
       const res = await fetch(`/api/register/society?email=${formData.email}`);
@@ -156,6 +162,7 @@ export default function Society() {
         setEmailAlreadyTaken(true);
       } else {
         setEmailAlreadyTaken(false);
+        setOtpSending(true);
         const otpRes = await fetch("/api/otp/send", {
           method: "POST",
           headers: {
@@ -167,6 +174,9 @@ export default function Society() {
         const otpData = await otpRes.json();
         if (!otpRes.ok) {
           console.error("OTP error:", otpData.error);
+        } else {
+          setOtpSending(false);
+          setOtpSent(true);
         }
       }
     } catch (error) {
@@ -392,9 +402,10 @@ export default function Society() {
                 <button
                   type="button"
                   onClick={() => sendEmailOtp()}
-                  className="bg-indigo-500 outline-none w-[30%] lg:w-[20%] text-white px-1 md:px-2 lg:px-4 py-2 rounded-r-md hover:bg-indigo-700 hover:cursor-pointer"
+                  disabled={otpSent}
+                  className={`bg-indigo-500 outline-none w-[30%] lg:w-[20%] text-white px-1 md:px-2 lg:px-4 py-2 rounded-r-md hover:bg-indigo-700 ${otpSent || otpSending ? "hover:cursor-not-allowed opacity-50" : "hover:cursor-pointer"}`}
                 >
-                  Send OTP
+                  {otpSending ? "Sending" : otpSent ? "Sent" : "Send OTP"}
                 </button>
               </div>
               {isEmailEmpty ? (

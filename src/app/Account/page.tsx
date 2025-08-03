@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import linkedin from "@/assets/LinkedIn.png";
 import instagram from "@/assets/Instagram.png";
 import Image from "next/image";
+import { getFirebaseToken } from "@/utils";
 
 export default function Account() {
   interface EligibilityCriterion {
@@ -187,9 +188,13 @@ export default function Account() {
         updatedData.logo = data.secure_url;
       }
       if (usernameAlreadyTaken) return;
+      const token = await getFirebaseToken();
       const res = await fetch("/api/society/account", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           societyEmail: currentUser?.email,
           updates: updatedData,

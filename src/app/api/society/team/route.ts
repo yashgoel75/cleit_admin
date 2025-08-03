@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
+import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 interface member {
   name: string,
@@ -9,6 +10,16 @@ interface member {
 }
 
 export async function POST(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, newMember } = await req.json();
 
@@ -34,6 +45,16 @@ export async function POST(req: NextRequest) {
 
 // PATCH: Partially update a team member (by email)
 export async function PATCH(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, memberEmail, updates } = await req.json();
 
@@ -70,6 +91,16 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE: Remove a team member (by email)
 export async function DELETE(req: NextRequest) {
+  // Auth
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Missing token" }, { status: 401 });
+  }
+  const token = authHeader.split(" ")[1];
+  const decodedToken = await verifyFirebaseToken(token);
+  if (!decodedToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { societyEmail, memberEmail } = await req.json();
 
@@ -123,3 +154,5 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+

@@ -6,6 +6,7 @@ import Footer from "@/app/Footer/page";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getFirebaseToken } from "@/utils";
 
 export default function Events() {
   interface EventData {
@@ -118,10 +119,13 @@ export default function Events() {
         };
 
     const method = editingEventId ? "PATCH" : "POST";
-
+    const token = await getFirebaseToken();
     const res = await fetch("/api/society/events", {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+       },
       body: JSON.stringify(body),
     });
 
@@ -154,10 +158,13 @@ export default function Events() {
 
   const handleDeleteEvent = async (eventId: string) => {
     if (!currentUser) return;
-
+    const token = await getFirebaseToken();
     const res = await fetch("/api/society/events", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+       },
       body: JSON.stringify({
         societyEmail: currentUser.email,
         eventId,

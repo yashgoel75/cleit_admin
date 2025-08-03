@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         const { data } = await resend.emails.send({
             from: "Cleit <connect@yashgoel.me>",
             to: email,
-            subject: "Welcome to Cleit Admin     - OTP Verification",
+            subject: "Welcome to Cleit Admin - OTP Verification",
             html: `
                 <img src="https://res.cloudinary.com/dqwjvwb8z/image/upload/v1753870491/cleit_ay8dhd.png" alt="Cleit Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
                 <h1>Welcome to Cleit!</h1>
