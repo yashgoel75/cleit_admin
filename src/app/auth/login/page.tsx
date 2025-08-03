@@ -26,6 +26,16 @@ export default function Login() {
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/Account");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -93,7 +103,6 @@ export default function Login() {
     }
   };
   const [user, setUser] = useState<User | null>(null);
-
 
   // async function sendEmailOtp() {
   //   try {

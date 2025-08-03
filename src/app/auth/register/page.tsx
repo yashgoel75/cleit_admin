@@ -5,7 +5,7 @@ import Tooltip from "@/app/Tooltip/page";
 import Image from "next/image";
 import logo from "@/assets/cleit.png";
 import Footer from "../Footer/page";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -34,6 +34,16 @@ export default function Society() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          router.push("/Account");
+        }
+      });
+  
+      return () => unsubscribe();
+  }, []);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");

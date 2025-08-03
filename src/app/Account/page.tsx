@@ -48,6 +48,7 @@ export default function Account() {
     website: string;
     about: string;
     auditionOpen: boolean;
+    centralized: boolean;
     team: TeamMember[];
     events: Event[];
     social: SocialLink[];
@@ -312,6 +313,16 @@ export default function Account() {
                   }
                 >
                   {societyData?.auditionOpen ? "Open" : "Closed"}
+                </span>
+              </p>
+              <p className="text-sm font-medium">
+                Centralized Society:&nbsp;
+                <span
+                  className={
+                    societyData?.centralized ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {societyData?.centralized ? "Yes" : "No"}
                 </span>
               </p>
             </section>
@@ -665,6 +676,25 @@ export default function Account() {
                       >
                         <option value="true">Open</option>
                         <option value="false">Closed</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label className="text-gray-700 font-medium">
+                        Centralized Society:
+                      </label>
+                      <select
+                        value={formData?.centralized ? "true" : "false"}
+                        onChange={(e) =>
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            centralized: e.target.value === "true",
+                          }))
+                        }
+                        className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                      >
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
                       </select>
                     </div>
                   </div>

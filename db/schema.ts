@@ -42,6 +42,7 @@ const society = new Schema({
   team: [team],
   social: [social],
   events: [event],
+  centralized: Boolean,
   auditionOpen: Boolean,
   eligibility: [eligibility],
 });

@@ -1,5 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Society } from "../../../../../db/schema";
+import { Types } from "mongoose";
+
+interface eventContact {
+  name: String,
+  designation: String,
+  mobile: String,
+  email: String,
+}
+
+interface event {
+  _id: Types.ObjectId;
+  title: String,
+  type: String,
+  startDate: String,
+  endDate: String,
+  venue: String,
+  time: String,
+  about: String,
+  contact: [eventContact],
+  socialGroup: String,
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,9 +37,9 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ events: society.events }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to fetch events", details: error.message },
+      { error: "Failed to fetch events" },
       { status: 500 }
     );
   }
@@ -46,9 +67,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to add event", details: error.message },
+      { error: "Failed to add event" },
       { status: 500 }
     );
   }
@@ -70,7 +91,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Society not found" }, { status: 404 });
     }
 
-    const eventIndex = society.events.findIndex((event: any) => event._id.toString() === eventId);
+    const eventIndex = society.events.findIndex((event: event) => event._id.toString() === eventId);
     if (eventIndex === -1) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
@@ -79,9 +100,9 @@ export async function PATCH(req: NextRequest) {
     await society.save();
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to update event", details: error.message },
+      { error: "Failed to update event" },
       { status: 500 }
     );
   }
@@ -109,9 +130,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ society }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Failed to delete event", details: error.message },
+      { error: "Failed to delete event" },
       { status: 500 }
     );
   }

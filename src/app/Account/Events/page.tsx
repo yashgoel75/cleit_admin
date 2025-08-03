@@ -9,44 +9,44 @@ import { auth } from "@/lib/firebase";
 
 export default function Events() {
   interface EventData {
-  _id: string;
-  title: string;
-  type?: string;
-  startDate: string;
-  endDate?: string;
-  venue: string;
-  time: string;
-  about: string;
-  socialGroup?: string;
-}
+    _id: string;
+    title: string;
+    type?: string;
+    startDate: string;
+    endDate?: string;
+    venue: string;
+    time: string;
+    about: string;
+    socialGroup?: string;
+  }
 
-type EventFormFields = {
-  [K in keyof Omit<EventData, "_id">]: string;
-};
+  type EventFormFields = {
+    [K in keyof Omit<EventData, "_id">]: string;
+  };
 
-const formFields = [
-  { name: "title", label: "Event Title", type: "text" },
-  {
-    name: "type",
-    label: "Event Type (Audition, Competition, etc.)",
-    type: "text",
-  },
-  { name: "startDate", label: "Start Date", type: "date" },
-  {
-    name: "endDate",
-    label: "End Date (optional, for multi-day events)",
-    type: "date",
-  },
-  { name: "venue", label: "Venue", type: "text" },
-  { name: "time", label: "Time", type: "time" },
-  { name: "about", label: "About the Event", elementType: "textarea" },
-  {
-    name: "socialGroup",
-    label: "WhatsApp Group Link (optional)",
-    type: "text",
-  },
-];
-  
+  const formFields = [
+    { name: "title", label: "Event Title", type: "text" },
+    {
+      name: "type",
+      label: "Event Type (Audition, Competition, etc.)",
+      type: "text",
+    },
+    { name: "startDate", label: "Start Date", type: "date" },
+    {
+      name: "endDate",
+      label: "End Date (optional, for multi-day events)",
+      type: "date",
+    },
+    { name: "venue", label: "Venue", type: "text" },
+    { name: "time", label: "Time", type: "time" },
+    { name: "about", label: "About the Event", elementType: "textarea" },
+    {
+      name: "socialGroup",
+      label: "WhatsApp Group Link (optional)",
+      type: "text",
+    },
+  ];
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
 
@@ -133,7 +133,7 @@ const formFields = [
     }
   };
 
-  const handleEditEvent = (event: any) => {
+  const handleEditEvent = (event: EventData) => {
     setEventFormData({
       title: event.title || "",
       type: event.type || "",
@@ -223,7 +223,7 @@ const formFields = [
                       id={field.name}
                       name={field.name}
                       type={field.type}
-                      value={(eventFormData as any)[field.name]}
+                      value={eventFormData[field.name as keyof EventFormFields]}
                       onChange={(e) =>
                         setEventFormData({
                           ...eventFormData,
@@ -269,7 +269,7 @@ const formFields = [
                   : "lg:grid-cols-3"
             }`}
           >
-            {events.map((event: any) => (
+            {events.map((event: EventData) => (
               <div
                 key={event._id}
                 className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"

@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       social: [],
       events: [],
       auditionOpen: false,
+      centralized: false,
       eligibility: []
     });
 

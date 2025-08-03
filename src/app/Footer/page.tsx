@@ -50,7 +50,7 @@ export default function Footer() {
               className="hover:cursor-pointer"
               onClick={() => router.push("/Contact")}
             >
-              Contact
+              Contact Us
             </li>
           </ul>
         </div>
