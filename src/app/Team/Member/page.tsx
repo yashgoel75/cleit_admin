@@ -12,7 +12,7 @@ type MemberProps = {
   instagram: string;
 };
 
-export default function Member({
+function Member({
   imageSrc,
   name,
   role,
@@ -52,3 +52,5 @@ export default function Member({
     </div>
   );
 }
+
+export default Member;
