@@ -380,108 +380,120 @@ export default function Account() {
             </section>
 
             <section>
-              <h4 className="flex items-center text-2xl font-semibold mb-4">
-                Events&nbsp;
-                <svg
-                  className="hover:cursor-pointer"
-                  onClick={() => router.push("/Account/Events")}
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24px"
-                  viewBox="0 -960 960 960"
-                  width="24px"
-                  fill="#000000"
-                >
-                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
-                </svg>
-              </h4>
-              <div>
-                {societyData?.events?.length || 0 > 0 ? (
-                  <div
-                    className={`grid gap-6 sm:grid-cols-2 ${
-                      societyData?.events.length === 1
-                        ? "lg:grid-cols-1"
-                        : societyData?.events.length === 2
-                          ? "lg:grid-cols-2"
-                          : "lg:grid-cols-3"
-                    }`}
-                  >
-                    {societyData?.events.map((event: Event) => (
-                      <div
-                        key={event._id}
-                        className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"
-                      >
-                        <div className="flex-grow">
-                          <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                            {event.title}
-                          </h3>
-                          {event.type && (
-                            <p className="text-base text-gray-600 mb-1">
-                              <span className="font-medium">Type:</span>&nbsp;
-                              {event.type}
-                            </p>
-                          )}
-                          <p className="text-base text-gray-600 mb-1">
-                            <span className="font-medium">Venue:</span>&nbsp;
-                            {event.venue}
-                          </p>
-                          <p className="text-base text-gray-600 mb-1">
-                            <span className="font-medium">Time:</span>&nbsp;
-                            {event.time}
-                          </p>
-                          {event.endDate &&
-                          event.endDate !== event.startDate ? (
-                            <>
-                              <p className="text-base text-gray-600 mb-1">
-                                <span className="font-medium">Start:</span>
-                                &nbsp;
-                                {new Date(event.startDate).toLocaleDateString(
-                                  "en-IN",
-                                )}
-                              </p>
-                              <p className="text-base text-gray-600 mb-1">
-                                <span className="font-medium">End:</span>&nbsp;
-                                {new Date(event.endDate).toLocaleDateString(
-                                  "en-IN",
-                                )}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-base text-gray-600 mb-1">
-                              <span className="font-medium">Date:</span>&nbsp;
-                              {new Date(event.startDate).toLocaleDateString(
-                                "en-IN",
+              <h4 className="text-2xl font-semibold mb-4">Events</h4>
+              {societyData?.events?.length || 0 > 0 ? (
+                (() => {
+                  const now = new Date();
+                  const events = societyData?.events ?? [];
+
+                  const ongoing = events?.filter((event: Event) => {
+                    const start = new Date(event.startDate);
+                    const end = event.endDate ? new Date(event.endDate) : start;
+                    return now >= start && now <= end;
+                  });
+
+                  const upcoming = events?.filter((event: Event) => {
+                    const start = new Date(event.startDate);
+                    return start > now;
+                  });
+
+                  const past = events?.filter((event: Event) => {
+                    const end = event.endDate
+                      ? new Date(event.endDate)
+                      : new Date(event.startDate);
+                    return end < now;
+                  });
+
+                  const renderEvents = (label: string, list: Event[]) =>
+                    list.length > 0 && (
+                      <>
+                        <h5 className="text-xl font-semibold text-indigo-700 mt-6 mb-2">
+                          {label}
+                        </h5>
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          {list.map((event: Event) => (
+                            <div
+                              key={event._id}
+                              className="bg-white border border-gray-200 rounded-xl shadow-md p-6"
+                            >
+                              <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                                {event.title}
+                              </h3>
+                              {event.type && (
+                                <p className="text-base text-gray-600 mb-1">
+                                  <strong>Type:</strong> {event.type}
+                                </p>
                               )}
-                            </p>
-                          )}
-                          <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
-                            <span className="font-medium">About:</span>&nbsp;
-                            {event.about}
-                          </p>
-                          {event.socialGroup && (
-                            <p className="text-indigo-600 text-sm mt-2 break-all">
-                              <a
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href={
-                                  event.socialGroup.startsWith("http")
-                                    ? event.socialGroup
-                                    : `https://${event.socialGroup}`
-                                }
-                              >
-                                {event.socialGroup.replace(/^https?:\/\//, "")}
-                              </a>
-                            </p>
-                          )}
+                              <p className="text-base text-gray-600 mb-1">
+                                <strong>Venue:</strong> {event.venue}
+                              </p>
+                              <p className="text-base text-gray-600 mb-1">
+                                <strong>Time:</strong> {event.time}
+                              </p>
+                              {event.endDate &&
+                              event.endDate !== event.startDate ? (
+                                <>
+                                  <p className="text-base text-gray-600 mb-1">
+                                    <strong>Start:</strong>{" "}
+                                    {new Date(
+                                      event.startDate,
+                                    ).toLocaleDateString("en-IN")}
+                                  </p>
+                                  <p className="text-base text-gray-600 mb-1">
+                                    <strong>End:</strong>{" "}
+                                    {new Date(event.endDate).toLocaleDateString(
+                                      "en-IN",
+                                    )}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-base text-gray-600 mb-1">
+                                  <strong>Date:</strong>{" "}
+                                  {new Date(event.startDate).toLocaleDateString(
+                                    "en-IN",
+                                  )}
+                                </p>
+                              )}
+                              <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
+                                <strong>About:</strong> {event.about}
+                              </p>
+                              {event.socialGroup && (
+                                <p className="text-indigo-600 text-sm mt-2 break-all">
+                                  <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    href={
+                                      event.socialGroup.startsWith("http")
+                                        ? event.socialGroup
+                                        : `https://${event.socialGroup}`
+                                    }
+                                  >
+                                    {event.socialGroup.replace(
+                                      /^https?:\/\//,
+                                      "",
+                                    )}
+                                  </a>
+                                </p>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 italic">
-                    No scheduled events right now. Stay tuned!
-                  </div>
-                )}
-              </div>
+                      </>
+                    );
+
+                  return (
+                    <>
+                      {renderEvents("Ongoing Events", ongoing)}
+                      {renderEvents("Upcoming Events", upcoming)}
+                      {renderEvents("Past Events", past)}
+                    </>
+                  );
+                })()
+              ) : (
+                <p className="text-gray-500 italic">
+                  No scheduled events right now. Stay tuned!
+                </p>
+              )}
             </section>
 
             <section>

@@ -124,8 +124,8 @@ export default function Events() {
       method,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-       },
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(body),
     });
 
@@ -163,8 +163,8 @@ export default function Events() {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-       },
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         societyEmail: currentUser.email,
         eventId,
@@ -174,6 +174,120 @@ export default function Events() {
     if (res.ok) {
       getSocietyByEmail(currentUser.email);
     }
+  };
+
+  const now = new Date();
+
+  const ongoingEvents = events.filter((event) => {
+    const start = new Date(event.startDate);
+    const end = event.endDate ? new Date(event.endDate) : start;
+    return now >= start && now <= end;
+  });
+
+  const upcomingEvents = events.filter((event) => {
+    const start = new Date(event.startDate);
+    return start > now;
+  });
+
+  const pastEvents = events.filter((event) => {
+    const end = event.endDate
+      ? new Date(event.endDate)
+      : new Date(event.startDate);
+    return end < now;
+  });
+
+  const renderEventSection = (label: string, list: EventData[]) => {
+    if (list.length === 0) return null;
+
+    return (
+      <>
+        <h3 className="text-2xl font-bold text-indigo-700 mt-10 mb-4">
+          {label}
+        </h3>
+        <section
+          className={`grid gap-6 sm:grid-cols-2 ${
+            list.length === 1
+              ? "lg:grid-cols-1"
+              : list.length === 2
+                ? "lg:grid-cols-2"
+                : "lg:grid-cols-3"
+          }`}
+        >
+          {list.map((event) => (
+            <div
+              key={event._id}
+              className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"
+            >
+              <div className="flex-grow">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  {event.title}
+                </h3>
+                {event.type && (
+                  <p className="text-base text-gray-600 mb-1">
+                    <span className="font-medium">Type:</span> {event.type}
+                  </p>
+                )}
+                <p className="text-base text-gray-600 mb-1">
+                  <span className="font-medium">Venue:</span> {event.venue}
+                </p>
+                <p className="text-base text-gray-600 mb-1">
+                  <span className="font-medium">Time:</span> {event.time}
+                </p>
+                {event.endDate && event.endDate !== event.startDate ? (
+                  <>
+                    <p className="text-base text-gray-600 mb-1">
+                      <span className="font-medium">Start:</span>{" "}
+                      {new Date(event.startDate).toLocaleDateString("en-IN")}
+                    </p>
+                    <p className="text-base text-gray-600 mb-1">
+                      <span className="font-medium">End:</span>{" "}
+                      {new Date(event.endDate).toLocaleDateString("en-IN")}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-base text-gray-600 mb-1">
+                    <span className="font-medium">Date:</span>{" "}
+                    {new Date(event.startDate).toLocaleDateString("en-IN")}
+                  </p>
+                )}
+                <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
+                  <span className="font-medium">About:</span> {event.about}
+                </p>
+                {event.socialGroup && (
+                  <p className="text-indigo-600 text-sm mt-2 break-all">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={
+                        event.socialGroup.startsWith("http")
+                          ? event.socialGroup
+                          : `https://${event.socialGroup}`
+                      }
+                    >
+                      {event.socialGroup.replace(/^https?:\/\//, "")}
+                    </a>
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-4 mt-4 pt-4 border-t border-gray-300">
+                <button
+                  onClick={() => handleEditEvent(event)}
+                  className="text-blue-600 hover:underline text-sm hover:cursor-pointer"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteEvent(event._id)}
+                  className="text-red-600 hover:underline text-sm hover:cursor-pointer"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </section>
+      </>
+    );
   };
 
   return (
@@ -267,88 +381,11 @@ export default function Events() {
         ) : events.length === 0 ? (
           <p className="text-center text-gray-600">No events found.</p>
         ) : (
-          <section
-            className={`grid gap-6 sm:grid-cols-2 ${
-              events.length === 1
-                ? "lg:grid-cols-1"
-                : events.length === 2
-                  ? "lg:grid-cols-2"
-                  : "lg:grid-cols-3"
-            }`}
-          >
-            {events.map((event: EventData) => (
-              <div
-                key={event._id}
-                className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl flex flex-col"
-              >
-                <div className="flex-grow">
-                  <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                    {event.title}
-                  </h3>
-                  {event.type && (
-                    <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Type:</span> {event.type}
-                    </p>
-                  )}
-                  <p className="text-base text-gray-600 mb-1">
-                    <span className="font-medium">Venue:</span> {event.venue}
-                  </p>
-                  <p className="text-base text-gray-600 mb-1">
-                    <span className="font-medium">Time:</span> {event.time}
-                  </p>
-                  {event.endDate && event.endDate !== event.startDate ? (
-                    <>
-                      <p className="text-base text-gray-600 mb-1">
-                        <span className="font-medium">Start:</span>&nbsp;
-                        {new Date(event.startDate).toLocaleDateString("en-IN")}
-                      </p>
-                      <p className="text-base text-gray-600 mb-1">
-                        <span className="font-medium">End:</span>&nbsp;
-                        {new Date(event.endDate).toLocaleDateString("en-IN")}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-base text-gray-600 mb-1">
-                      <span className="font-medium">Date:</span>&nbsp;
-                      {new Date(event.startDate).toLocaleDateString("en-IN")}
-                    </p>
-                  )}
-                  <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
-                    <span className="font-medium">About:</span> {event.about}
-                  </p>
-                  {event.socialGroup && (
-                    <p className="text-indigo-600 text-sm mt-2 break-all">
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={
-                          event.socialGroup?.startsWith("http")
-                            ? event.socialGroup
-                            : `https://${event.socialGroup}`
-                        }
-                      >
-                        {event.socialGroup.replace(/^https?:\/\//, "")}
-                      </a>
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-4 mt-4 pt-4 border-t border-gray-300">
-                  <button
-                    onClick={() => handleEditEvent(event)}
-                    className="text-blue-600 hover:underline text-sm hover:cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteEvent(event._id)}
-                    className="text-red-600 hover:underline text-sm hover:cursor-pointer"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </section>
+          <>
+            {renderEventSection("Ongoing Events", ongoingEvents)}
+            {renderEventSection("Upcoming Events", upcomingEvents)}
+            {renderEventSection("Past Events", pastEvents)}
+          </>
         )}
       </main>
       <Footer />
