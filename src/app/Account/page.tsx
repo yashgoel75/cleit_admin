@@ -54,6 +54,7 @@ export default function Account() {
     events: Event[];
     social: SocialLink[];
     eligibility: EligibilityCriterion[];
+    type: string;
   }
 
   const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
@@ -313,7 +314,7 @@ export default function Account() {
                   {societyData?.website?.replace(/^https?:\/\//, "")}
                 </a>
               </p>
-              <p className="text-gray-700 mt-2">{societyData?.about}</p>
+              <p className="text-gray-700 mt-2">{societyData?.type}</p>
               <p className="text-gray-500 mt-1">{societyData?.email}</p>
               <p className="mt-2 text-sm font-medium">
                 🎭 Auditions:&nbsp;
@@ -337,6 +338,13 @@ export default function Account() {
                   {societyData?.centralized ? "Yes" : "No"}
                 </span>
               </p>
+            </section>
+
+            <section>
+              <h4 className="flex items-center text-2xl font-semibold mb-4">
+                About
+              </h4>
+              <div className="md:text-lg">{societyData?.about}</div>
             </section>
 
             <section>
@@ -659,6 +667,33 @@ export default function Account() {
                         Username Already Taken
                       </span>
                     ) : null}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-700 font-medium">
+                      Category:
+                    </label>
+                    <select
+                      value={formData?.type}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? {
+                                ...formData,
+                                type: e.target.value,
+                              }
+                            : null,
+                        )
+                      }
+                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                    >
+                      <option>Academic & Technical</option>
+                      <option>Cultural & Arts</option>
+                      <option>Social & Service</option>
+                      <option>Sports & Fitness</option>
+                      <option>Leadership & Communication</option>
+                      <option>Misc / Special Interest</option>
+                      <option>Others</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block font-medium mb-1">About</label>

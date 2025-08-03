@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
       events: [],
       auditionOpen: false,
       centralized: false,
-      eligibility: []
+      eligibility: [],
+      type: 'Others'
     });
 
     console.log(society);
