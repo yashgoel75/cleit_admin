@@ -54,18 +54,20 @@ export default function Account() {
     social: SocialLink[];
     eligibility: EligibilityCriterion[];
   }
+
   const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(false);
   const [societyData, setSocietyData] = useState<Society | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState<any>(null);
+  const [formData, setFormData] = useState<Society | null>(null); // Type formData as Society | null
   const [isEdit, setIsEdit] = useState(false);
   const [isPreview, setIsPreview] = useState(true);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [success, setSuccess] = useState(false); // Fixed typo: sucess -> success
   const router = useRouter();
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export default function Account() {
       if (!res.ok)
         throw new Error(data.error || "Failed to fetch society data");
       setSocietyData(data.society);
-      setFormData(data.society);
+      setFormData(data.society); // formData is set to Society or null
       setLogoPreview(data.society?.logo || null);
       setError(null);
     } catch (err: unknown) {
@@ -108,22 +110,25 @@ export default function Account() {
   };
 
   const handleEligibilityChange = (index: number, value: string) => {
+    if (!formData) return; // Null check
     const updated = [...formData.eligibility];
     updated[index].name = value;
-    setFormData((prev: any) => ({ ...prev, eligibility: updated }));
+    setFormData({ ...formData, eligibility: updated });
   };
 
   const handleAddEligibility = () => {
-    setFormData((prev: any) => ({
-      ...prev,
-      eligibility: [...(prev?.eligibility || []), { name: "" }],
-    }));
+    if (!formData) return; // Null check
+    setFormData({
+      ...formData,
+      eligibility: [...formData.eligibility, { name: "" }],
+    });
   };
 
   const handleRemoveEligibility = (index: number) => {
+    if (!formData) return; // Null check
     const updated = [...formData.eligibility];
     updated.splice(index, 1);
-    setFormData((prev: any) => ({ ...prev, eligibility: updated }));
+    setFormData({ ...formData, eligibility: updated });
   };
 
   const handleSocialChange = (
@@ -131,22 +136,25 @@ export default function Account() {
     field: "name" | "handle",
     value: string,
   ) => {
+    if (!formData) return; // Null check
     const updated = [...formData.social];
     updated[index][field] = value;
-    setFormData((prev: any) => ({ ...prev, social: updated }));
+    setFormData({ ...formData, social: updated });
   };
 
   const handleAddSocial = () => {
-    setFormData((prev: any) => ({
-      ...prev,
-      social: [...(prev?.social || []), { name: "LinkedIn", handle: "" }],
-    }));
+    if (!formData) return; // Null check
+    setFormData({
+      ...formData,
+      social: [...formData.social, { name: "LinkedIn", handle: "" }],
+    });
   };
 
   const handleRemoveSocial = (index: number) => {
+    if (!formData) return; // Null check
     const updated = [...formData.social];
     updated.splice(index, 1);
-    setFormData((prev: any) => ({ ...prev, social: updated }));
+    setFormData({ ...formData, social: updated });
   };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,21 +165,20 @@ export default function Account() {
     }
   };
 
-  const [sucess, setSuccess] = useState(false);
   const handleUpdate = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !formData) return; // Null check for formData
     setIsUpdating(true);
     const updatedData = { ...formData };
 
     try {
       if (logoFile) {
-        const formData = new FormData();
-        formData.append("file", logoFile);
-        formData.append("upload_preset", "cleit_admin_logo");
+        const uploadFormData = new FormData(); // Rename to avoid confusion
+        uploadFormData.append("file", logoFile);
+        uploadFormData.append("upload_preset", "cleit_admin_logo");
         const cloudinaryUploadUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
         const response = await fetch(cloudinaryUploadUrl, {
           method: "POST",
-          body: formData,
+          body: uploadFormData,
         });
         const data = await response.json();
         if (!response.ok) {
@@ -215,6 +222,7 @@ export default function Account() {
   };
 
   async function isUsernameAvailable() {
+    if (!formData) return; // Null check
     try {
       const res = await fetch(
         `/api/register/society?username=${formData.username}`,
@@ -300,7 +308,6 @@ export default function Account() {
                   {societyData?.website?.replace(/^https?:\/\//, "")}
                 </a>
               </p>
-
               <p className="text-gray-700 mt-2">{societyData?.about}</p>
               <p className="text-gray-500 mt-1">{societyData?.email}</p>
               <p className="mt-2 text-sm font-medium">
@@ -382,7 +389,6 @@ export default function Account() {
                   <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z" />
                 </svg>
               </h4>
-
               <div>
                 {societyData?.events?.length || 0 > 0 ? (
                   <div
@@ -403,24 +409,20 @@ export default function Account() {
                           <h3 className="text-2xl font-semibold text-gray-800 mb-2">
                             {event.title}
                           </h3>
-
                           {event.type && (
                             <p className="text-base text-gray-600 mb-1">
                               <span className="font-medium">Type:</span>&nbsp;
                               {event.type}
                             </p>
                           )}
-
                           <p className="text-base text-gray-600 mb-1">
                             <span className="font-medium">Venue:</span>&nbsp;
                             {event.venue}
                           </p>
-
                           <p className="text-base text-gray-600 mb-1">
                             <span className="font-medium">Time:</span>&nbsp;
                             {event.time}
                           </p>
-
                           {event.endDate &&
                           event.endDate !== event.startDate ? (
                             <>
@@ -446,12 +448,10 @@ export default function Account() {
                               )}
                             </p>
                           )}
-
                           <p className="text-base text-gray-600 mb-1 whitespace-pre-wrap">
                             <span className="font-medium">About:</span>&nbsp;
                             {event.about}
                           </p>
-
                           {event.socialGroup && (
                             <p className="text-indigo-600 text-sm mt-2 break-all">
                               <a
@@ -487,12 +487,10 @@ export default function Account() {
                   const handleUrl = s.handle.startsWith("http")
                     ? s.handle
                     : `https://${s.handle}`;
-
                   const username = s.handle
                     .replace(/\/+$/, "")
                     .split("/")
                     .pop();
-
                   return (
                     <li key={i} className="flex items-center gap-2 md:gap-3">
                       <Image
@@ -520,7 +518,6 @@ export default function Account() {
               <h4 className="text-2xl font-semibold mb-4">
                 Eligibility Criteria
               </h4>
-
               {societyData?.eligibility?.length || 0 > 0 ? (
                 <ul className="list-disc list-inside text-gray-700 space-y-1">
                   {societyData?.eligibility.map(
@@ -537,236 +534,245 @@ export default function Account() {
             </section>
           </div>
         ) : (
-          <>
-            <div className="space-y-10 text-base md:text-lg">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleUpdate();
-                }}
-                className="space-y-8"
-              >
-                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-                  <h3 className="text-2xl font-bold mb-4 text-center">
-                    Edit Society Info
-                  </h3>
-                  <div className="grid gap-6">
-                    <div>
-                      <label className="block font-medium mb-1">
-                        Society Logo
-                      </label>
-                      <div className="flex-1 md:flex items-center gap-4 mt-2">
-                        {logoPreview && (
-                          <img
-                            src={logoPreview}
-                            alt="Logo Preview"
-                            className="w-24 h-24 object-cover rounded-full border-2 border-indigo-700"
-                          />
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleLogoChange}
-                          className="mt-2 md:mt-0 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          <div className="space-y-10 text-base md:text-lg">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdate();
+              }}
+              className="space-y-8"
+            >
+              <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                <h3 className="text-2xl font-bold mb-4 text-center">
+                  Edit Society Info
+                </h3>
+                <div className="grid gap-6">
+                  <div>
+                    <label className="block font-medium mb-1">
+                      Society Logo
+                    </label>
+                    <div className="flex-1 md:flex items-center gap-4 mt-2">
+                      {logoPreview && (
+                        <img
+                          src={logoPreview}
+                          alt="Logo Preview"
+                          className="w-24 h-24 object-cover rounded-full border-2 border-indigo-700"
                         />
-                      </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        className="mt-2 md:mt-0 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                      />
                     </div>
-                    <div>
-                      <label className="block font-medium mb-1">
-                        Society Name
-                      </label>
+                  </div>
+                  <div>
+                    <label className="block font-medium mb-1">
+                      Society Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData?.name || ""}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? { ...formData, name: e.target.value }
+                            : null,
+                        )
+                      }
+                      placeholder="Enter society name"
+                      className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-medium mb-1">Website</label>
+                    <div className="flex gap-1">
                       <input
                         type="text"
-                        value={formData?.name || ""}
+                        value={formData?.website || ""}
                         onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            name: e.target.value,
-                          }))
+                          setFormData(
+                            formData
+                              ? { ...formData, website: e.target.value }
+                              : null,
+                          )
                         }
-                        placeholder="Enter society name"
+                        placeholder="Enter website"
                         className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
                       />
-                    </div>
-                    <div>
-                      <label className="block font-medium mb-1">Website</label>
-                      <div className="flex gap-1">
-                        <input
-                          type="text"
-                          value={formData?.website || ""}
-                          onChange={(e) => {
-                            setFormData((prev: any) => ({
-                              ...prev,
-                              website: e.target.value,
-                            }));
-                          }}
-                          placeholder="Enter website"
-                          className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block font-medium mb-1">Username</label>
-                      <div className="flex gap-1">
-                        <input
-                          type="text"
-                          value={formData?.username || ""}
-                          onChange={(e) => {
-                            setFormData((prev: any) => ({
-                              ...prev,
-                              username: e.target.value,
-                            }));
-                            setUsernameAlreadyTaken(false);
-                            setUsernameAvailable(false);
-                          }}
-                          placeholder="Enter username"
-                          className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            isUsernameAvailable();
-                          }}
-                          className="text-center rounded-md px-3 py-1 bg-indigo-500 hover:bg-indigo-700 hover:cursor-pointer text-white"
-                        >
-                          Check
-                        </button>
-                      </div>
-                      {usernameAvailable ? (
-                        <span className="text-green-700 text-sm ml-1">
-                          Username Available
-                        </span>
-                      ) : null}
-                      {usernameAlreadyTaken ? (
-                        <span className="text-red-700 text-sm ml-1">
-                          Username Already Taken
-                        </span>
-                      ) : null}
-                    </div>
-                    <div>
-                      <label className="block font-medium mb-1">About</label>
-                      <textarea
-                        rows={4}
-                        value={formData?.about || ""}
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            about: e.target.value,
-                          }))
-                        }
-                        placeholder="Tell us about your society"
-                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <label className="text-gray-700 font-medium">
-                        Auditions:
-                      </label>
-                      <select
-                        value={formData?.auditionOpen ? "true" : "false"}
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            auditionOpen: e.target.value === "true",
-                          }))
-                        }
-                        className="py-1 font-bold border-b border-gray-300 focus:outline-none"
-                      >
-                        <option value="true">Open</option>
-                        <option value="false">Closed</option>
-                      </select>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <label className="text-gray-700 font-medium">
-                        Centralized Society:
-                      </label>
-                      <select
-                        value={formData?.centralized ? "true" : "false"}
-                        onChange={(e) =>
-                          setFormData((prev: any) => ({
-                            ...prev,
-                            centralized: e.target.value === "true",
-                          }))
-                        }
-                        className="py-1 font-bold border-b border-gray-300 focus:outline-none"
-                      >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                      </select>
                     </div>
                   </div>
-                </section>
-
-                <section className="bg-white p-4 sm:p-4 rounded-xl shadow-md">
-                  <h3 className="text-2xl font-semibold mb-4 text-center">
-                    Social Links
-                  </h3>
-                  <div className="space-y-4">
-                    {formData?.social?.map((s: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex shadow-md rounded-lg p-2 justify-center flex-col md:flex-row gap-2 items-start md:items-center"
+                  <div>
+                    <label className="block font-medium mb-1">Username</label>
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={formData?.username || ""}
+                        onChange={(e) => {
+                          setFormData(
+                            formData
+                              ? { ...formData, username: e.target.value }
+                              : null,
+                          );
+                          setUsernameAlreadyTaken(false);
+                          setUsernameAvailable(false);
+                        }}
+                        placeholder="Enter username"
+                        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          isUsernameAvailable();
+                        }}
+                        className="text-center rounded-md px-3 py-1 bg-indigo-500 hover:bg-indigo-700 hover:cursor-pointer text-white"
                       >
-                        <select
-                          value={s.name}
-                          onChange={(e) =>
-                            handleSocialChange(idx, "name", e.target.value)
-                          }
-                          className="px-3 py-2 border-b border-gray-200 w-full md:w-1/4 focus:outline-none"
-                        >
-                          <option value="LinkedIn">LinkedIn</option>
-                          <option value="Instagram">Instagram</option>
-                        </select>
-                        <input
-                          type="text"
-                          value={s.handle}
-                          onChange={(e) =>
-                            handleSocialChange(idx, "handle", e.target.value)
-                          }
-                          placeholder="Profile URL"
-                          className="w-full border-b border-gray-200 px-4 py-2  focus:outline-none focus:ring-b focus:ring-indigo-500"
-                        />
-                        <div className="text-center px-4 text-red-500 font-medium md:hidden">
-                          <button onClick={() => handleRemoveSocial(idx)}>
-                            Delete
-                          </button>
-                        </div>
-                        <button
-                          type="button"
-                          className="hidden md:flex mr-4 hover:cursor-pointer"
-                          onClick={() => handleRemoveSocial(idx)}
-                        >
-                          <svg
-                            className="rounded-full bg-white p-0.5 flex items-center"
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="24px"
-                            viewBox="0 -960 960 960"
-                            width="24px"
-                            fill="#8C1A10"
-                          >
-                            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={handleAddSocial}
-                      className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
+                        Check
+                      </button>
+                    </div>
+                    {usernameAvailable ? (
+                      <span className="text-green-700 text-sm ml-1">
+                        Username Available
+                      </span>
+                    ) : null}
+                    {usernameAlreadyTaken ? (
+                      <span className="text-red-700 text-sm ml-1">
+                        Username Already Taken
+                      </span>
+                    ) : null}
+                  </div>
+                  <div>
+                    <label className="block font-medium mb-1">About</label>
+                    <textarea
+                      rows={4}
+                      value={formData?.about || ""}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? { ...formData, about: e.target.value }
+                            : null,
+                        )
+                      }
+                      placeholder="Tell us about your society"
+                      className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-700 font-medium">
+                      Auditions:
+                    </label>
+                    <select
+                      value={formData?.auditionOpen ? "true" : "false"}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? {
+                                ...formData,
+                                auditionOpen: e.target.value === "true",
+                              }
+                            : null,
+                        )
+                      }
+                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
                     >
-                      + Add Social Link
-                    </button>
+                      <option value="true">Open</option>
+                      <option value="false">Closed</option>
+                    </select>
                   </div>
-                </section>
-                <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-                  <h3 className="text-2xl font-semibold mb-4 text-center">
-                    Eligibility Criteria
-                  </h3>
-                  <div className="space-y-3">
-                    {formData?.eligibility?.map((e: any, idx: number) => (
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-700 font-medium">
+                      Centralized Society:
+                    </label>
+                    <select
+                      value={formData?.centralized ? "true" : "false"}
+                      onChange={(e) =>
+                        setFormData(
+                          formData
+                            ? {
+                                ...formData,
+                                centralized: e.target.value === "true",
+                              }
+                            : null,
+                        )
+                      }
+                      className="py-1 font-bold border-b border-gray-300 focus:outline-none"
+                    >
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+              <section className="bg-white p-4 sm:p-4 rounded-xl shadow-md">
+                <h3 className="text-2xl font-semibold mb-4 text-center">
+                  Social Links
+                </h3>
+                <div className="space-y-4">
+                  {formData?.social?.map((s: SocialLink, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex shadow-md rounded-lg p-2 justify-center flex-col md:flex-row gap-2 items-start md:items-center"
+                    >
+                      <select
+                        value={s.name}
+                        onChange={(e) =>
+                          handleSocialChange(idx, "name", e.target.value)
+                        }
+                        className="px-3 py-2 border-b border-gray-200 w-full md:w-1/4 focus:outline-none"
+                      >
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Instagram">Instagram</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={s.handle}
+                        onChange={(e) =>
+                          handleSocialChange(idx, "handle", e.target.value)
+                        }
+                        placeholder="Profile URL"
+                        className="w-full border-b border-gray-200 px-4 py-2 focus:outline-none focus:ring-b focus:ring-indigo-500"
+                      />
+                      <div className="text-center px-4 text-red-500 font-medium md:hidden">
+                        <button onClick={() => handleRemoveSocial(idx)}>
+                          Delete
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        className="hidden md:flex mr-4 hover:cursor-pointer"
+                        onClick={() => handleRemoveSocial(idx)}
+                      >
+                        <svg
+                          className="rounded-full bg-white p-0.5 flex items-center"
+                          xmlns="http://www.w3.org/2000/svg"
+                          height="24px"
+                          viewBox="0 -960 960 960"
+                          width="24px"
+                          fill="#8C1A10"
+                        >
+                          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleAddSocial}
+                    className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
+                  >
+                    + Add Social Link
+                  </button>
+                </div>
+              </section>
+              <section className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
+                <h3 className="text-2xl font-semibold mb-4 text-center">
+                  Eligibility Criteria
+                </h3>
+                <div className="space-y-3">
+                  {formData?.eligibility?.map(
+                    (e: EligibilityCriterion, idx: number) => (
                       <div
                         key={idx}
                         className="shadow-md rounded-lg p-2 flex-1 md:flex gap-2 items-center shadow"
@@ -802,45 +808,46 @@ export default function Account() {
                           </svg>
                         </button>
                       </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={handleAddEligibility}
-                      className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
-                    >
-                      + Add Eligibility Criterion
-                    </button>
-                  </div>
-                </section>
-
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <button
-                    type="submit"
-                    disabled={isUpdating}
-                    className={`bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed ${isUpdating || sucess ? "opacity-50" : ""}`}
-                  >
-                    {isUpdating
-                      ? "Saving..."
-                      : sucess
-                        ? "Saved"
-                        : "Save Changes"}
-                  </button>
+                    ),
+                  )}
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsEdit(false);
-                      setIsPreview(true);
-                      setFormData(societyData);
-                      setLogoFile(null);
-                    }}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer"
+                    onClick={handleAddEligibility}
+                    className="mt-2 text-indigo-600 hover:underline hover:cursor-pointer"
                   >
-                    Cancel
+                    + Add Eligibility Criterion
                   </button>
                 </div>
-              </form>
-            </div>
-          </>
+              </section>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className={`bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer disabled:bg-indigo-300 disabled:cursor-not-allowed ${
+                    isUpdating || success ? "opacity-50" : ""
+                  }`}
+                >
+                  {isUpdating
+                    ? "Saving..."
+                    : success
+                      ? "Saved"
+                      : "Save Changes"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEdit(false);
+                    setIsPreview(true);
+                    setFormData(societyData);
+                    setLogoFile(null);
+                  }}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-semibold transition w-full sm:w-fit hover:cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         )}
       </main>
       <Footer />
