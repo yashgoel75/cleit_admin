@@ -142,12 +142,9 @@ export default function Header() {
       {isMobileNavOpen && (
         <div className="lg:hidden fixed inset-0 bg-white z-40 px-5 py-3">
           <div className="flex justify-between items-center mb-6 relative">
-            <Link className="focus:outline-none" href={"/"}>
+            <Link className="focus:outline-none relative" href={"/"}>
               <Image src={logo} width={140} alt="Cleit" />
             </Link>
-            <div className="absolute inset-0 flex items-center justify-center font-bold text-lg text-gray-800">
-              VIPS-TC
-            </div>
             <button
               onClick={() => setIsMobileNavOpen(false)}
               className="text-2xl relative text-gray-800 hover:cursor-pointer"
@@ -158,6 +155,9 @@ export default function Header() {
           <div className="space-y-5 text-lg">
             {user ? (
               <>
+                <p className="font-semibold cursor-pointer">
+                  Vivekananda Institute of Professional Studies
+                </p>
                 <p
                   onClick={() => router.push("/Account")}
                   className="font-semibold cursor-pointer"
@@ -210,7 +210,13 @@ export default function Header() {
                 )}
               </>
             ) : (
-              <AuthButtons />
+              <>
+                <p className="font-semibold cursor-pointer">
+                  Vivekananda Institute of Professional Studies - Technical
+                  Campus
+                </p>
+                <AuthButtons />
+              </>
             )}
           </div>
         </div>
@@ -223,7 +229,11 @@ export default function Header() {
           </Link>
         </div>
         <div className="hidden lg:flex flex-1 justify-center items-center font-bold text-xl">
-          Vivekananda Institute of Professional Studies
+          <button>
+            <a href="https://vips.edu">
+              Vivekananda Institute of Professional Studies
+            </a>
+          </button>
         </div>
         <div className="hidden lg:flex items-center gap-6 absolute right-0 px-5">
           {user ? (
@@ -239,9 +249,6 @@ export default function Header() {
           ) : (
             <AuthButtons />
           )}
-        </div>
-        <div className="absolute lg:hidden inset-0 flex items-center justify-center font-bold text-lg text-gray-800">
-          VIPS-TC
         </div>
         <div className="block lg:hidden absolute right-0 px-5">
           <button
