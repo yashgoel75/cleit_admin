@@ -654,7 +654,7 @@ export default function Account() {
                           e.preventDefault();
                           isUsernameAvailable();
                         }}
-                        className="w-full sm:w-auto px-4 py-2 text-center rounded-md bg-indigo-500 hover:bg-indigo-700 text-white font-medium transition-colors"
+                        className="w-full sm:w-auto px-4 py-2 text-center rounded-md bg-indigo-500 hover:bg-indigo-700 text-white font-medium transition-colors hover:cursor-pointer"
                       >
                         Check
                       </button>
@@ -791,7 +791,7 @@ export default function Account() {
                       <button
                         type="button"
                         onClick={() => handleRemoveSocial(idx)}
-                        className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center"
+                        className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center hover:cursor-pointer"
                       >
                         Delete
                       </button>
@@ -800,7 +800,7 @@ export default function Account() {
                   <button
                     type="button"
                     onClick={handleAddSocial}
-                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors"
+                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors hover:cursor-pointer"
                   >
                     + Add Social Link
                   </button>
@@ -829,7 +829,7 @@ export default function Account() {
                         <button
                           type="button"
                           onClick={() => handleRemoveEligibility(idx)}
-                          className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center"
+                          className="w-full sm:w-auto px-4 py-2 text-red-500 font-medium rounded-md hover:bg-red-50 transition-colors sm:self-center hover:cursor-pointer"
                         >
                           Delete
                         </button>
@@ -839,7 +839,7 @@ export default function Account() {
                   <button
                     type="button"
                     onClick={handleAddEligibility}
-                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors"
+                    className="mt-2 text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors hover:cursor-pointer"
                   >
                     + Add Eligibility Criterion
                   </button>
@@ -850,7 +850,9 @@ export default function Account() {
                   type="submit"
                   disabled={isUpdating}
                   className={`w-full sm:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold transition-colors disabled:bg-indigo-300 disabled:cursor-not-allowed ${
-                    isUpdating || success ? "opacity-50" : ""
+                    isUpdating || success
+                      ? "opacity-50"
+                      : "hover:cursor-pointer"
                   }`}
                 >
                   {isUpdating
@@ -867,7 +869,7 @@ export default function Account() {
                     setFormData(societyData);
                     setLogoFile(null);
                   }}
-                  className="w-full sm:w-auto px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-semibold transition-colors"
+                  className="w-full sm:w-auto px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-semibold transition-colors hover:cursor-pointer"
                 >
                   Cancel
                 </button>
