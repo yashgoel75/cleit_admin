@@ -689,6 +689,7 @@ export default function Account() {
                       <option>Cultural & Arts</option>
                       <option>Social & Service</option>
                       <option>Sports & Fitness</option>
+                      <option>Gaming</option>
                       <option>Leadership & Communication</option>
                       <option>Misc / Special Interest</option>
                       <option>Others</option>
