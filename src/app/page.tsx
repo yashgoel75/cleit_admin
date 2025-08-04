@@ -23,7 +23,7 @@ export default function Account() {
       <main className="min-h-[85vh] flex justify-center items-center px-4 bg-gradient-to-br from-white via-gray-50 to-white onest-normal">
         <div className="max-w-4xl text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900">
-            Put your society on the map —
+            Put your society or club on the map —
             <br />
             <span className="bg-indigo-100 px-2 rounded-md text-gray-900">
               manage members, post events,

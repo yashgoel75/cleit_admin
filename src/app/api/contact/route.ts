@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
       `,
         });
 
-        // 2. Email to you (admin copy)
         await resend.emails.send({
             from: 'Cleit <connect@yashgoel.me>',
             to: 'yash.goel8370@gmail.com',

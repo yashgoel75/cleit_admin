@@ -63,13 +63,13 @@ export default function Account() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState<Society | null>(null); // Type formData as Society | null
+  const [formData, setFormData] = useState<Society | null>(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isPreview, setIsPreview] = useState(true);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [success, setSuccess] = useState(false); // Fixed typo: sucess -> success
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function Account() {
       if (!res.ok)
         throw new Error(data.error || "Failed to fetch society data");
       setSocietyData(data.society);
-      setFormData(data.society); // formData is set to Society or null
+      setFormData(data.society);
       setLogoPreview(data.society?.logo || null);
       setError(null);
     } catch (err: unknown) {
@@ -112,14 +112,14 @@ export default function Account() {
   };
 
   const handleEligibilityChange = (index: number, value: string) => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     const updated = [...formData.eligibility];
     updated[index].name = value;
     setFormData({ ...formData, eligibility: updated });
   };
 
   const handleAddEligibility = () => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     setFormData({
       ...formData,
       eligibility: [...formData.eligibility, { name: "" }],
@@ -127,7 +127,7 @@ export default function Account() {
   };
 
   const handleRemoveEligibility = (index: number) => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     const updated = [...formData.eligibility];
     updated.splice(index, 1);
     setFormData({ ...formData, eligibility: updated });
@@ -138,14 +138,14 @@ export default function Account() {
     field: "name" | "handle",
     value: string,
   ) => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     const updated = [...formData.social];
     updated[index][field] = value;
     setFormData({ ...formData, social: updated });
   };
 
   const handleAddSocial = () => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     setFormData({
       ...formData,
       social: [...formData.social, { name: "LinkedIn", handle: "" }],
@@ -153,7 +153,7 @@ export default function Account() {
   };
 
   const handleRemoveSocial = (index: number) => {
-    if (!formData) return; // Null check
+    if (!formData) return;
     const updated = [...formData.social];
     updated.splice(index, 1);
     setFormData({ ...formData, social: updated });
@@ -168,13 +168,13 @@ export default function Account() {
   };
 
   const handleUpdate = async () => {
-    if (!currentUser || !formData) return; // Null check for formData
+    if (!currentUser || !formData) return;
     setIsUpdating(true);
     const updatedData = { ...formData };
 
     try {
       if (logoFile) {
-        const uploadFormData = new FormData(); // Rename to avoid confusion
+        const uploadFormData = new FormData();
         uploadFormData.append("file", logoFile);
         uploadFormData.append("upload_preset", "cleit_admin_logo");
         const cloudinaryUploadUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -228,7 +228,7 @@ export default function Account() {
   };
 
   async function isUsernameAvailable() {
-    if (!formData) return; // Null check
+    if (!formData) return;
     try {
       const res = await fetch(
         `/api/register/society?username=${formData.username}`,

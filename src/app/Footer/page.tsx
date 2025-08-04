@@ -36,7 +36,7 @@ export default function Footer() {
             </li>
             <li
               className="hover:cursor-pointer"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/About")}
             >
               About Us
             </li>
