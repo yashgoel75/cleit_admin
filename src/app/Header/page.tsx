@@ -80,13 +80,13 @@ export default function Header() {
       <nav className="font-medium text-lg">
         <ul className="flex gap-4">
           <li
-            className="hover:underline cursor-pointer"
+            className={`hover:underline cursor-pointer ${isLogoutConfirmationMessage ? "hidden" : null}`}
             onClick={() => router.push("/Account/Events")}
           >
             Events
           </li>
           <li
-            className="hover:underline cursor-pointer"
+            className={`hover:underline cursor-pointer ${isLogoutConfirmationMessage ? "hidden" : null}`}
             onClick={() => router.push("/Account/Team")}
           >
             Team
@@ -103,13 +103,13 @@ export default function Header() {
             </div>
             <div className="flex gap-4">
               <button
-                className="hover:cursor-pointer text-red-700"
+                className="hover:cursor-pointer hover:underline text-red-700"
                 onClick={handleLogout}
               >
                 Yes
               </button>
               <button
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer hover:underline"
                 onClick={() => setIsLogoutConfirmationMessage(false)}
               >
                 No
@@ -155,7 +155,7 @@ export default function Header() {
           <div className="space-y-5 text-lg">
             {user ? (
               <>
-                <p className="font-semibold cursor-pointer">
+                <p className={`font-semibold cursor-pointer`}>
                   Vivekananda Institute of Professional Studies
                 </p>
                 <p
@@ -240,7 +240,7 @@ export default function Header() {
             <>
               <button
                 onClick={() => router.push("/Account")}
-                className="font-semibold text-lg hover:text-indigo-700 transition hover:cursor-pointer"
+                className={`font-semibold text-lg hover:text-indigo-700 transition hover:cursor-pointer ${isLogoutConfirmationMessage ? "hidden" : null}`}
               >
                 {displayName}
               </button>

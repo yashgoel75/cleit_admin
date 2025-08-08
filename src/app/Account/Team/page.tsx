@@ -7,6 +7,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Footer from "@/app/Footer/page";
 import { getFirebaseToken } from "@/utils";
+import { useRouter } from "next/navigation";
 
 export default function Account() {
   interface TeamMember {
@@ -21,6 +22,8 @@ export default function Account() {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState<TeamMember>({
     name: "",
@@ -55,8 +58,14 @@ export default function Account() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      getSocietyByEmail(user?.email);
+      if (user) {
+        setCurrentUser(user);
+        getSocietyByEmail(user?.email);
+      } else {
+        setTimeout(() => {
+          router.push("/");
+        }, 500);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -78,8 +87,8 @@ export default function Account() {
       method,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-       },
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(body),
     });
 
@@ -105,8 +114,8 @@ export default function Account() {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-       },
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         societyEmail: currentUser.email,
         memberEmail: email,

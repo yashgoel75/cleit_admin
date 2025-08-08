@@ -12,14 +12,14 @@ export default function Team() {
     {
       imageSrc: yashgoel,
       name: "Yash Goel",
-      role: "Co-Founder | Frontend Lead",
+      role: "Founder | Frontend Lead",
       linkedin: "https://linkedin.com/in/yashgoel75",
       instagram: "",
     },
     {
       imageSrc: namanarora,
       name: "Naman Arora",
-      role: "Co-Founder | Backend Lead",
+      role: "Backend Lead",
       linkedin: "https://linkedin.com/in/naman22a",
       instagram: "https://instagram.com/naman22a",
     },

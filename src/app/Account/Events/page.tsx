@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { getFirebaseToken } from "@/utils";
+import { useRouter } from "next/navigation";
 
 export default function Events() {
   interface EventData {
@@ -48,6 +49,7 @@ export default function Events() {
     },
   ];
 
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
 
@@ -99,6 +101,9 @@ export default function Events() {
         getSocietyByEmail(user.email);
       } else {
         setLoading(false);
+        setTimeout(() => {
+          router.push("/");
+        }, 500);
       }
     });
     return () => unsubscribe();
