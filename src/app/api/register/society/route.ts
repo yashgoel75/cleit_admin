@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
       auditionOpen: false,
       centralized: false,
       eligibility: [],
-      type: 'Others'
+      type: 'Others',
+      facultyCoordinator: ""
     });
 
     console.log(society);

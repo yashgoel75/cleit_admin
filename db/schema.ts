@@ -45,7 +45,8 @@ const society = new Schema({
   centralized: Boolean,
   auditionOpen: Boolean,
   eligibility: [eligibility],
-  type: String
+  type: String,
+  facultyCoordinator: String
 });
 const user = new Schema({
   name: String,

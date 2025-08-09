@@ -56,6 +56,7 @@ export default function Account() {
     social: SocialLink[];
     eligibility: EligibilityCriterion[];
     type: string;
+    facultyCoordinator: string;
   }
 
   const [usernameAlreadyTaken, setUsernameAlreadyTaken] = useState(false);
@@ -74,6 +75,7 @@ export default function Account() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [faculty, setFaculty] = useState("");
 
   const router = useRouter();
   async function handleDelete() {
@@ -414,6 +416,19 @@ export default function Account() {
                       {societyData?.centralized ? "Yes" : "No"}
                     </span>
                   </p>
+                </section>
+
+                <section>
+                  <h4 className="flex items-center">
+                    <span className="font-semibold text-2xl">
+                      Faculty Coordinator:
+                    </span>
+                    &nbsp;
+                    <span className="text-xl">
+                      {societyData?.facultyCoordinator}
+                    </span>
+                  </h4>
+                  <div className="md:text-lg"></div>
                 </section>
 
                 <section>
@@ -802,6 +817,26 @@ export default function Account() {
                       </div>
                       <div>
                         <label className="block font-medium mb-1 text-gray-700">
+                          Faculty Coordinator
+                        </label>
+                        <input
+                          value={formData?.facultyCoordinator || ""}
+                          onChange={(e) =>
+                            setFormData(
+                              formData
+                                ? {
+                                    ...formData,
+                                    facultyCoordinator: e.target.value,
+                                  }
+                                : null,
+                            )
+                          }
+                          placeholder="Who's your faculty coordinator?"
+                          className="w-full max-w-full border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 rounded-md focus:outline-none focus:ring focus:ring-indigo-200 box-border"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-medium mb-1 text-gray-700">
                           About
                         </label>
                         <textarea
@@ -879,7 +914,7 @@ export default function Account() {
                             onChange={(e) =>
                               handleSocialChange(idx, "name", e.target.value)
                             }
-                            className="w-full sm:w-1/3 px-3 py-2 border-b border-gray-300 focus:outline-none focus:ring-indigo-200"
+                            className="w-full sm:w-1/3 px-2 py-2 border-b border-gray-300 focus:outline-none focus:ring-indigo-200"
                           >
                             <option value="LinkedIn">LinkedIn</option>
                             <option value="Instagram">Instagram</option>
