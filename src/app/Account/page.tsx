@@ -418,16 +418,16 @@ export default function Account() {
                 </section>
 
                 <section>
-                  <h4 className="flex-1 items-center">
-                    <span className="font-semibold text-2xl">
-                      Faculty Coordinator:
-                    </span>
-                    &nbsp;
-                    <span className="text-xl">
+                  <div className="md:flex items-center">
+                    <h4 className="items-center">
+                      <span className="font-semibold text-2xl">
+                        Faculty Coordinator:&nbsp;
+                      </span>
+                    </h4>
+                    <span className="text-lg md:text-xl">
                       {societyData?.facultyCoordinator}
                     </span>
-                  </h4>
-                  <div className="md:text-lg"></div>
+                  </div>
                 </section>
 
                 <section>
