@@ -2,7 +2,7 @@
 import Header from "./Header/page";
 import "./page.css";
 import { useState, useEffect } from "react";
-import { getAuth, signOut, onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Footer from "./Footer/page";
 

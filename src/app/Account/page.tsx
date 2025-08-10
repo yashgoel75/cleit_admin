@@ -75,7 +75,6 @@ export default function Account() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
-  const [faculty, setFaculty] = useState("");
 
   const router = useRouter();
   async function handleDelete() {
@@ -419,7 +418,7 @@ export default function Account() {
                 </section>
 
                 <section>
-                  <h4 className="flex items-center">
+                  <h4 className="flex-1 items-center">
                     <span className="font-semibold text-2xl">
                       Faculty Coordinator:
                     </span>

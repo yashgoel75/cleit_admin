@@ -14,7 +14,9 @@ export default function Footer() {
     <footer className="bg-gray-100 px-6 py-10 pt-10 onest-normal">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <Link className="focus:outline-none" href={"/"}><Image src={logo} width={170} alt="Cleit"></Image></Link>
+          <Link className="focus:outline-none" href={"/"}>
+            <Image src={logo} width={170} alt="Cleit"></Image>
+          </Link>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-3">About Us</h3>
@@ -48,9 +50,9 @@ export default function Footer() {
             </li>
             <li
               className="hover:cursor-pointer"
-              onClick={() => router.push("/Contact")}
+              onClick={() => router.push("/releasenotes")}
             >
-              Contact Us
+              Release Notes
             </li>
           </ul>
         </div>
@@ -65,6 +67,12 @@ export default function Footer() {
               >
                 connect@cleit.in
               </a>
+            </li>
+            <li
+              className="hover:cursor-pointer"
+              onClick={() => router.push("/Contact")}
+            >
+              Contact Us
             </li>
             <li>
               <a

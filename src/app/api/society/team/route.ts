@@ -11,7 +11,6 @@ interface member {
 }
 
 export async function POST(req: NextRequest) {
-  // Auth
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
@@ -45,9 +44,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH: Partially update a team member (by email)
 export async function PATCH(req: NextRequest) {
-  // Auth
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
@@ -79,7 +76,6 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Team member not found" }, { status: 404 });
     }
 
-    // Apply updates to the matched member
     Object.assign(society.team[memberIndex], updates);
     await society.save();
 
@@ -92,9 +88,7 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE: Remove a team member (by email)
 export async function DELETE(req: NextRequest) {
-  // Auth
   const authHeader = req.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing token" }, { status: 401 });
@@ -134,7 +128,6 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
-// GET: Fetch society by email (to get team)
 export async function GET(req: NextRequest) {
   try {
     await register();

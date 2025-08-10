@@ -1,7 +1,7 @@
 import redis from '@/lib/redis';
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
-const resend = new Resend('re_P5BHG8XZ_2Gz7tD25q5KmAq1wCfwJLamT');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
     const { email } = await req.json();
