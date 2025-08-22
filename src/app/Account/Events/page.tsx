@@ -52,7 +52,7 @@ export default function Events() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
-
+  const [isAddingUpdating, setIsAddingUpdating] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +111,7 @@ export default function Events() {
 
   const handleEventSubmit = async () => {
     if (!currentUser) return;
-
+    setIsAddingUpdating(true);
     const body = editingEventId
       ? {
           societyEmail: currentUser.email,
@@ -135,6 +135,7 @@ export default function Events() {
     });
 
     if (res.ok) {
+      setIsAddingUpdating(false);
       setEventFormData(initialFormState);
       setEditingEventId(null);
       setIsFormVisible(false);
@@ -365,9 +366,14 @@ export default function Events() {
             <div className="flex gap-4 justify-center mt-8">
               <button
                 onClick={handleEventSubmit}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition hover:cursor-pointer"
+                disabled={isAddingUpdating}
+                className={`bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition hover:cursor-pointer disabled:cursor-not-allowed ${isAddingUpdating ? "opacity-50" : ""}`}
               >
-                {editingEventId ? "Update Event" : "Add Event"}
+                {editingEventId
+                  ? "Update Event"
+                  : isAddingUpdating
+                    ? "Adding"
+                    : "Add Event"}
               </button>
               <button
                 onClick={() => setIsFormVisible(false)}

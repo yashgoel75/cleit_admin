@@ -68,6 +68,8 @@ export default function Society() {
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
   const [isConfirmPasswordEmpty, setIsConfirmPasswordEmpty] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -151,8 +153,6 @@ export default function Society() {
       console.error("Error checking username:", error);
     }
   }
-  const [otpSending, setOtpSending] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
   async function sendEmailOtp() {
     try {
       const res = await fetch(`/api/register/society?email=${formData.email}`);
