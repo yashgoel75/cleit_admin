@@ -6,6 +6,7 @@ import Footer from "../Footer/page";
 import yashgoel from "@/assets/team/yash_goel.png";
 import namanarora from "@/assets/team/naman_arora.png";
 import urvashisharma from "@/assets/team/urvashi_sharma.png";
+import vaibhavarya from "@/assets/team/vaibhav_arya.png";
 
 export default function Team() {
   const teamMembers = [
@@ -30,6 +31,13 @@ export default function Team() {
       linkedin: "https://linkedin.com/in/urvashi.shr",
       instagram: "https://instagram.com/urvashi.shr",
     },
+    {
+      imageSrc: vaibhavarya,
+      name: "Vaibhav Arya",
+      role: "Head of Social Media",
+      linkedin: "https://linkedin.com/in/vaibhav-arya-737772324",
+      instagram: "https://instagram.com/vaibhav.aryaa",
+    },
   ];
 
   return (
@@ -39,7 +47,7 @@ export default function Team() {
         <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">
           Meet Our Team
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-10 lg:gap-35 justify-items-center">
           {teamMembers.map((member, index) => (
             <Member
               key={index}
