@@ -807,6 +807,7 @@ export default function Account() {
                           <option>Academic & Technical</option>
                           <option>Cultural & Arts</option>
                           <option>Social & Service</option>
+                          <option>Social Entrepreneurship</option>
                           <option>Sports & Fitness</option>
                           <option>Gaming</option>
                           <option>Leadership & Communication</option>
