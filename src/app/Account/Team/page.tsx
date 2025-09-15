@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function Account() {
   interface TeamMember {
+    _id: string;
     name: string;
     designation: string;
     mobile: string;
@@ -25,19 +26,19 @@ export default function Account() {
 
   const router = useRouter();
 
-  const [formData, setFormData] = useState<TeamMember>({
+  const [formData, setFormData] = useState<Omit<TeamMember, "_id">>({
     name: "",
     designation: "",
     mobile: "",
     email: "",
   });
-  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
   const getSocietyByEmail = async (email: string | null | undefined) => {
     try {
       const res = await fetch(
-        `/api/society/team?email=${encodeURIComponent(email || "")}`,
+        `/api/society/team?email=${encodeURIComponent(email || "")}`
       );
       const data = await res.json();
       if (!res.ok)
@@ -46,11 +47,7 @@ export default function Account() {
       setDisplayName(data.society.name);
       setError(null);
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -70,69 +67,75 @@ export default function Account() {
     return () => unsubscribe();
   }, []);
 
-  const handleSubmit = async () => {
-    if (!currentUser) return;
+  // Inside handleSubmit:
+const handleSubmit = async () => {
+  if (!currentUser) return;
 
-    const body = editingEmail
-      ? {
-          societyEmail: currentUser.email,
-          memberEmail: editingEmail,
-          updates: formData,
-        }
-      : { societyEmail: currentUser.email, newMember: formData };
+  const body = editingId
+    ? {
+        societyEmail: currentUser.email,
+        memberId: editingId,   // <-- use _id
+        updates: formData,
+      }
+    : { societyEmail: currentUser.email, newMember: formData };
 
-    const method = editingEmail ? "PATCH" : "POST";
-    const token = await getFirebaseToken();
-    const res = await fetch("/api/society/team", {
+  const method = editingId ? "PATCH" : "POST";
+  const token = await getFirebaseToken();
+
+  const res = await fetch(
+    editingId ? `/api/society/team/${editingId}` : `/api/society/team`,
+    {
       method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(body),
-    });
-
-    if (res.ok) {
-      setFormData({ name: "", designation: "", mobile: "", email: "" });
-      setEditingEmail(null);
-      setIsAdding(false);
-      getSocietyByEmail(currentUser.email);
     }
-  };
-  const [isMemberEmailToDelete, setIsMemberEmailToDelete] = useState(false);
-  const [memberEmailToDelete, setMemberEmailToDelete] = useState("");
-  const handleDeleteConfirmation = (email: string) => {
-    if (!currentUser) return;
-    setIsMemberEmailToDelete(true);
-    setMemberEmailToDelete(email);
-  };
+  );
 
-  const handleDelete = async (email: string) => {
+  if (res.ok) {
+    setFormData({ name: "", designation: "", mobile: "", email: "" });
+    setEditingId(null);
+    setIsAdding(false);
+    getSocietyByEmail(currentUser.email);
+  }
+};
+
+
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+
+  const handleDelete = async (memberId: string) => {
     if (!currentUser) return;
     const token = await getFirebaseToken();
-    const res = await fetch("/api/society/team", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        societyEmail: currentUser.email,
-        memberEmail: email,
-      }),
-    });
+    const res = await fetch(
+      `/api/society/team/${memberId}?societyEmail=${encodeURIComponent(
+        currentUser.email!
+      )}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (res.ok) {
+      setConfirmingDeleteId(null);
       getSocietyByEmail(currentUser.email);
     }
   };
 
   const handleEdit = (member: TeamMember) => {
-    setFormData(member);
-    setEditingEmail(member.email);
+    setFormData({
+      name: member.name,
+      designation: member.designation,
+      mobile: member.mobile,
+      email: member.email,
+    });
+    setEditingId(member._id);
     setIsAdding(false);
-    setIsMemberEmailToDelete(false);
-    setMemberEmailToDelete("");
+    setConfirmingDeleteId(null);
   };
 
   return (
@@ -147,9 +150,8 @@ export default function Account() {
           <button
             onClick={() => {
               setFormData({ name: "", designation: "", mobile: "", email: "" });
-              setIsMemberEmailToDelete(false);
-              setMemberEmailToDelete("");
-              setEditingEmail(null);
+              setConfirmingDeleteId(null);
+              setEditingId(null);
               setIsAdding(true);
             }}
             className="bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-medium transition hover:cursor-pointer"
@@ -158,17 +160,17 @@ export default function Account() {
           </button>
         </div>
 
-        {(isAdding || editingEmail !== null) && (
+        {(isAdding || editingId !== null) && (
           <div className="mb-10 bg-gray-50 p-6 rounded-lg shadow-md max-w-xl mx-auto">
             <h3 className="text-xl font-semibold mb-4 text-center">
-              {editingEmail ? "Edit Member" : "Add New Member"}
+              {editingId ? "Edit Member" : "Add New Member"}
             </h3>
             <div className="grid grid-cols-1 gap-4">
               {["name", "designation", "mobile", "email"].map((field) => (
                 <input
                   key={field}
                   type="text"
-                  value={formData[field as keyof TeamMember]}
+                  value={formData[field as keyof typeof formData]}
                   onChange={(e) =>
                     setFormData({ ...formData, [field]: e.target.value })
                   }
@@ -181,7 +183,7 @@ export default function Account() {
                   onClick={handleSubmit}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition hover:cursor-pointer"
                 >
-                  {editingEmail ? "Update" : "Add"}
+                  {editingId ? "Update" : "Add"}
                 </button>
                 <button
                   onClick={() => {
@@ -191,7 +193,7 @@ export default function Account() {
                       mobile: "",
                       email: "",
                     });
-                    setEditingEmail(null);
+                    setEditingId(null);
                     setIsAdding(false);
                   }}
                   className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md transition hover:cursor-pointer"
@@ -215,20 +217,20 @@ export default function Account() {
               team.length === 1
                 ? "lg:grid-cols-1"
                 : team.length === 2
-                  ? "lg:grid-cols-2"
-                  : "lg:grid-cols-3"
+                ? "lg:grid-cols-2"
+                : "lg:grid-cols-3"
             }`}
           >
-            {team.map((member: TeamMember) => (
+            {team.map((member) => (
               <div
-                key={member.email}
+                key={member._id}
                 className="bg-white border border-gray-200 rounded-xl shadow-md p-6 transition-all hover:shadow-xl"
               >
                 <h3 className="text-2xl font-semibold text-gray-800 mb-2">
                   {member.name}
                 </h3>
                 <p className="text-base text-gray-600 mb-1">
-                  <span className="font-medium">Designation:</span>
+                  <span className="font-medium">Designation:</span>{" "}
                   {member.designation}
                 </p>
                 <p className="text-base text-gray-600 mb-1">
@@ -237,8 +239,7 @@ export default function Account() {
                 <p className="text-base text-gray-600">
                   <span className="font-medium">Email:</span> {member.email}
                 </p>
-                {isMemberEmailToDelete &&
-                member.email === memberEmailToDelete ? (
+                {confirmingDeleteId === member._id ? (
                   <>
                     <div className="mt-2 text-red-600">
                       Are you sure you want to delete?
@@ -246,7 +247,7 @@ export default function Account() {
                     <div className="flex gap-4">
                       <div className="text-red-800">
                         <button
-                          onClick={() => handleDelete(member.email)}
+                          onClick={() => handleDelete(member._id)}
                           className="hover:cursor-pointer"
                         >
                           Yes
@@ -254,10 +255,7 @@ export default function Account() {
                       </div>
                       <div>
                         <button
-                          onClick={() => {
-                            setIsMemberEmailToDelete(false);
-                            setMemberEmailToDelete("");
-                          }}
+                          onClick={() => setConfirmingDeleteId(null)}
                           className="hover:cursor-pointer"
                         >
                           Cancel
@@ -274,7 +272,7 @@ export default function Account() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDeleteConfirmation(member.email)}
+                      onClick={() => setConfirmingDeleteId(member._id)}
                       className="text-red-600 hover:underline text-sm hover:cursor-pointer"
                     >
                       Delete

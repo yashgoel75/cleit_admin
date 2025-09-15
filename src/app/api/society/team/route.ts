@@ -88,45 +88,6 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Missing token" }, { status: 401 });
-  }
-  const token = authHeader.split(" ")[1];
-  const decodedToken = await verifyFirebaseToken(token);
-  if (!decodedToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  try {
-    await register();
-    const { societyEmail, memberEmail } = await req.json();
-
-    if (!societyEmail || !memberEmail) {
-      return NextResponse.json(
-        { error: "societyEmail and memberEmail are required" },
-        { status: 400 }
-      );
-    }
-
-    const society = await Society.findOneAndUpdate(
-      { email: societyEmail },
-      { $pull: { team: { email: memberEmail } } },
-      { new: true }
-    ).select("-password");
-
-    if (!society) {
-      return NextResponse.json({ error: "Society or member not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ society }, { status: 200 });
-  } catch (error: unknown) {
-    return NextResponse.json(
-      { error: "Failed to delete member" },
-      { status: 500 }
-    );
-  }
-}
 
 export async function GET(req: NextRequest) {
   try {
